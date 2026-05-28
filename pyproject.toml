@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcp-verified"
-version = "0.0.1"
+version = "0.1.0"
 description = "Reproducible, batched audit of every server in the official MCP registry under four constraints (free, no credit card, local-first, security-first)."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["mcp", "model-context-protocol", "audit", "registry", "security", "ollama", "local-llm"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
