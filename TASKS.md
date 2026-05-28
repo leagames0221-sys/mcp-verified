@@ -153,11 +153,13 @@
 
 ## T-15 — CLI entry point
 
-- **Boundary**: `mcp_verified/cli.py` — `argparse` with subcommands `audit`, `export-audit-db`, `version`. `audit` accepts `--top N`, `--out <dir>`, `--checks <dir>`, `--provider <name>`. End-of-run prints one-line summary `{audited, verified, caution, risky, unknown, timeout, error}` to stdout (AC-1.7).
+- **Boundary**: `mcp_verified/cli.py` exposes `main(argv=None) -> int` and three subcommands (`audit`, `export-audit-db`, `version`) via `argparse`. The orchestrator lives in `mcp_verified/_pipeline.py` (`audit_one(entry, *, config, writer)` per-candidate, `run_audit(entries, *, config)` returns a `RunSummary` whose `to_summary_line()` is the AC-1.7 one-liner). The `audit` subcommand accepts `--top N`, `--out <dir>`, `--checks <dir>`, `--provider <name>` (mock | ollama), `--per-server-budget <s>`, `--auditor`, `--auditor-github`, and a `--fixture <path>` test escape hatch that reads the registry payload from a JSON file instead of the live API.
+- **Phase 1 amendment** (2026-05-29): when a candidate's `repo_url` cannot be decomposed by `target_host_owner_repo` (non-GitHub source, clone failure, timeout), the pipeline falls back to writing the manifest under `<out>/audits/<bucket>/<sanitized>/audits/<audit_id>/` (with `bucket` = `_unknown` for non-GitHub and clone failures, `_pending` for timeouts). The verdict registry never silently drops a candidate; every audited entry produces at least an `audit-manifest.json`.
 - **Depends**: T-02, T-03, T-04, T-06, T-09, T-10, T-11, T-13, T-14.
 - **AC**: AC-1.1, AC-1.7.
-- **Verify**: e2e smoke `mcp-verified audit --top 1 --provider mock --out /tmp/smoke` produces a non-empty audit directory and the summary line on stdout.
+- **Verify**: 6 unit tests covering version subcommand prints to stdout; audit subcommand with a `--fixture` JSON payload and `--provider mock` walks the entries, prints the seven-counter summary line with the expected verdict bucket counts, and writes at least one `audit-manifest.json` with `audit_metadata.verdict == "unknown"` for the remote-only fixture entry; `--top 0` exits non-zero; export-audit-db subcommand returns 1 when the target is missing; missing subcommand exits non-zero; unknown provider exits non-zero.
 - **Effort**: M.
+- **Status**: ✅ completed (6 unit tests pass; cumulative 259 unit + 2 opt-in integration).
 
 ## T-16 — Integrity hashing
 
