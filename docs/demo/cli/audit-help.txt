@@ -1,0 +1,21 @@
+usage: mcp-verified audit [-h] [--top TOP] --out OUT [--checks CHECKS]
+                          [--provider {ollama,mock}]
+                          [--per-server-budget PER_SERVER_BUDGET]
+                          [--auditor AUDITOR]
+                          [--auditor-github AUDITOR_GITHUB]
+                          [--fixture FIXTURE]
+
+options:
+  -h, --help            show this help message and exit
+  --top TOP             Number of top candidates to audit.
+  --out OUT             Root output directory.
+  --checks CHECKS       Directory containing .md check definitions.
+  --provider {ollama,mock}
+                        LLM provider for the LLM-assisted executor.
+  --per-server-budget PER_SERVER_BUDGET
+                        Wall-clock cap per candidate (seconds).
+  --auditor AUDITOR     Override auditor name (default mcp-verified).
+  --auditor-github AUDITOR_GITHUB
+                        Override auditor GitHub handle.
+  --fixture FIXTURE     (test) Read registry payload from this JSON file
+                        instead of network.

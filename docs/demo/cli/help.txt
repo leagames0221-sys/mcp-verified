@@ -1,0 +1,14 @@
+usage: mcp-verified [-h] {audit,export-audit-db,version} ...
+
+Reproducible, batched audit of every server in the official MCP registry under
+four constraints (free, no credit card, local-first, security-first).
+
+positional arguments:
+  {audit,export-audit-db,version}
+    audit               Walk the registry, audit candidates, write the verdict
+                        tree.
+    export-audit-db     Package one target's audit subtree as a tarball.
+    version             Print the package version.
+
+options:
+  -h, --help            show this help message and exit

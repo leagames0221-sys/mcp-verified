@@ -1,0 +1,9 @@
+{
+  "audit_count": 1,
+  "audit_ids": [
+    "mcp-verified-2026-05-28-001"
+  ],
+  "latest_audit_id": "mcp-verified-2026-05-28-001",
+  "latest_verdict": "risky",
+  "repo_url": "https://github.com/frumu-ai/tandem"
+}

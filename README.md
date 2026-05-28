@@ -26,21 +26,24 @@ This project is a sibling of [`mcp-guard`](https://github.com/leagames0221-sys/m
 
 ## Quickstart
 
+A five-command, no-Ollama-required walkthrough is at
+[`examples/quickstart.md`](examples/quickstart.md). The short form:
+
 ```bash
-# Install
 git clone https://github.com/leagames0221-sys/mcp-verified
 cd mcp-verified
-pip install -e .
-
-# Pull the default local model
-ollama pull gemma3:4b
-
-# Run an audit against the official registry (top 50 by popularity by default)
-mcp-verified audit --top 50 --out audits/
-
-# Inspect a single server's verdict
-cat audits/github.com/<owner>/<repo>/audits/*/security-assessment.md
+pip install -e ".[dev]"
+mcp-verified audit \
+    --fixture tests/fixtures/registry-snapshot-2026-05-28.json \
+    --top 3 --provider mock --out my-audit
+cat my-audit/audits/github.com/*/*/audits/*/security-assessment.md
 ```
+
+For the live registry, drop `--fixture` and optionally
+`ollama pull gemma3:4b` if you want LLM-assisted checks.
+
+Recorded CLI captures and a sample verdict registry tree live under
+[`docs/demo/`](docs/demo/).
 
 ## Limitations
 

@@ -1,0 +1,37 @@
+{
+  "audit_id": "mcp-verified-2026-05-28-001",
+  "audit_metadata": {
+    "finished_at": "2026-05-28T18:52:54Z",
+    "integrity": {
+      "mcp_verified_version": "0.0.1",
+      "tree_commit": "050d7018f1a62a38d1b49c535561e8832142cf9d",
+      "tree_sha256": "271973ed3358309d10750ac1df5c2863f144a0d22a3ac161559e25b7fabb5467"
+    },
+    "started_at": "2026-05-28T18:51:20Z",
+    "status": "completed",
+    "time_spent_minutes": 1.5676809166666668,
+    "verdict": "risky"
+  },
+  "auditor": {
+    "github": "leagames0221-sys",
+    "name": "mcp-verified",
+    "org": ""
+  },
+  "compliance_checks": [],
+  "findings_summary": {
+    "critical": 0,
+    "high": 28,
+    "info": 0,
+    "low": 0,
+    "medium": 0
+  },
+  "target": {
+    "commit_hash": "050d7018f1a62a38d1b49c535561e8832142cf9d",
+    "repo_url": "https://github.com/frumu-ai/tandem",
+    "version": "0.3.0"
+  },
+  "tools_used": [
+    "mcp-verified/0.0.1",
+    "provider/mock"
+  ]
+}
