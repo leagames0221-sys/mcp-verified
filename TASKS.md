@@ -89,11 +89,13 @@
 
 ## T-09 — LLM-assisted check executor
 
-- **Boundary**: `mcp_verified/checks/executors/llm_assisted.py` — for checks whose frontmatter declares `requires_llm: true`, render the `AI instructions` section + selected file excerpts as the prompt, call the configured provider with a per-check JSON schema, parse the response, emit `list[Finding]`.
+- **Boundary**: `mcp_verified/checks/executors/llm_assisted.py` — `LLMAssistedExecutor` (frozen dataclass) holds a `Provider` (default `MockProvider`), AI section title fallbacks, file-excerpt size cap, max files per prompt, and the standard skip-dirs / extension allowlist / max-file-size. `run(repo_root, checks)` filters to checks with `requires_llm: true` in `raw_frontmatter`; for each, renders a prompt that combines the `For AI Assistants: Automated Analysis` section (or a fallback section) with bounded excerpts of every candidate file, calls the provider with a JSON schema hint, coerces the response into `Finding` records, and sorts the merged output by (file, line, rule_id) so two runs against the same input produce identical output.
+- **Phase 1 amendment** (2026-05-29): `ProviderResponseError` for a single check is caught and turned into one synthetic `CHECK-RUN-ERROR-<check_id>` Finding so the audit run is never aborted by one malformed LLM response. `ProviderUnreachableError` is deliberately NOT caught at this layer; callers wrap with `query_with_fallback` if they want a mock swap. Malformed individual `findings[]` entries (non-dict, type mismatches) are skipped rather than failing the whole check.
 - **Depends**: T-05, T-07.
 - **AC**: AC-3.2, AC-3.4.
-- **Verify**: unit test that two consecutive runs against the mock provider produce identical findings; unit test that a malformed (non-JSON) response is rejected and the check returns `error` not a partial result.
+- **Verify**: 14 unit tests covering determinism (two runs with mock produce identical output), `requires_llm` filter (eligible checks reach the provider, ineligible checks do not — and zero-eligible means zero provider calls), response parsing (well-formed findings surface; missing optional fields get defaults; non-dict entries are skipped; non-list `findings` field emits one error finding; missing `findings` field returns empty), error handling (`ProviderResponseError` becomes one error finding per failed check; `ProviderUnreachableError` propagates; missing repo root raises), and prompt construction (AI instructions surface; fallback to full body when section is missing).
 - **Effort**: M.
+- **Status**: ✅ completed (14 unit tests pass; cumulative 169 unit + 2 opt-in integration).
 
 ## T-10 — Per-server budget enforcer
 
