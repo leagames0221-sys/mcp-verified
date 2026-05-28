@@ -187,11 +187,19 @@ def load_check(path: Path) -> CheckDefinition | None:
 
 
 def load_checks(checks_dir: Path) -> list[CheckDefinition]:
-    """Load every `.md` under `checks_dir`. Skip inactive. Sort by id."""
+    """Load every `.md` under `checks_dir`. Skip inactive. Sort by id.
+
+    By convention, files whose stem begins with an uppercase letter
+    (`README.md`, `ATTRIBUTION.md`, `CHECK-TEMPLATE.md`) are treated as
+    documentation siblings of the check set and not as check definitions
+    themselves; they are silently skipped.
+    """
     if not checks_dir.is_dir():
         raise CheckLoadError(f"checks directory does not exist: {checks_dir}")
     loaded: list[CheckDefinition] = []
     for path in sorted(checks_dir.glob("*.md")):
+        if path.stem and path.stem[0].isupper():
+            continue
         check = load_check(path)
         if check is not None:
             loaded.append(check)

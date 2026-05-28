@@ -173,11 +173,13 @@
 
 ## T-17 — Check seed: fork mcpserver-audit
 
-- **Boundary**: copy upstream `checks/*.md` into this repo's `checks/`, preserving the five-section structure and CWE-tag frontmatter. Land `checks/ATTRIBUTION.md` recording upstream commit hash, Apache 2.0 license terms, and date of fork. Three MCP-specific extensions (`mcp-transport-security.md`, `tool-poisoning-detection.md`, `redirect-hijacking.md`) modeled on arXiv 2510.16558 attack taxonomy.
+- **Boundary**: copy upstream `checks/*.md` into this repo's `checks/`, preserving the five-section structure and CWE-tag frontmatter. Land `checks/ATTRIBUTION.md` recording the pinned upstream commit hash, the Apache 2.0 license terms, and the date of fork. Three MCP-specific extensions (`mcp-transport-security.md`, `tool-poisoning-detection.md`, `redirect-hijacking.md`) modeled on arXiv 2510.16558 attack taxonomy.
+- **Phase 1 amendment** (2026-05-29): six upstream files forked verbatim at pinned commit `8e54ffb77e710bd26009786d93a5df154fa4b45d` — four `active` (credential-management, advanced-obfuscation-evasion, dynamic-content-execution, python-authentication-semgrep) plus two `draft` (ci-secrets, http-client-resilience) retained for documentation; the loader honors the upstream convention and skips `status != "active"` automatically. Upstream `network-port-binding-security-check.md` was **excluded** because it lacks the YAML frontmatter envelope our loader requires and we declined to silently modify upstream content; the omission is recorded in `checks/ATTRIBUTION.md`. The loader was extended with one small convention: files whose stem begins with an uppercase letter (`ATTRIBUTION.md`, `README.md`, `CHECK-TEMPLATE.md`) are treated as documentation siblings and silently skipped by `load_checks()`.
 - **Depends**: T-01.
 - **AC**: AC-6.1.
-- **Verify**: `bash scripts/private_path_check.sh` clean; `pre-commit run --all-files` clean; `checks/ATTRIBUTION.md` validated by hand against upstream commit hash.
+- **Verify**: 5 unit tests against the shipped directory — `load_checks()` returns at least seven active definitions including the three MCP-specific extensions; `credential-management-security.md` parses with `priority=critical` and `798` in `cwe`; `ci-secrets.md` (draft) is skipped; the three MCP-specific files load as `status=active`; `ATTRIBUTION.md` exists, names the pinned upstream commit, and references Apache 2.0. `bash scripts/private_path_check.sh` clean.
 - **Effort**: M.
+- **Status**: ✅ completed (5 unit tests pass; cumulative 280 unit + 2 opt-in integration).
 
 ## T-18 — Tests + coverage
 
