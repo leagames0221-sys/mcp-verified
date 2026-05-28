@@ -44,8 +44,9 @@
 - **Boundary**: `mcp_verified/clone/safe_clone.py` — wrap `git clone --depth=1 --filter=tree:0 <url> <scratch>` with a hard prohibition on running any candidate-defined script. Returns a `ClonedRepo` with `path`, `commit_hash`, `cleanup()`. Always cleans up on exit (`with` context manager). Refuses to clone anything not on `github.com`.
 - **Depends**: T-01.
 - **AC**: AC-1.3, AC-1.6, AC-5.4.
-- **Verify**: unit test against a recorded git bundle (`tests/fixtures/sample-repo.bundle`); negative test that asserts a non-`github.com` URL raises; negative test that asserts no subprocess call invokes `npm`, `pip`, `node`, `python` against cloned content.
+- **Verify**: monkeypatched subprocess unit tests assert that only `git` is invoked (no `npm` / `pip` / `node` / `python` etc.); URL-gate negative tests cover GitLab, HTTP, missing-repo, query-string, and fragment URLs; failure / timeout tests assert the scratch directory is removed on every error path; one opt-in integration test clones `octocat/Hello-World` against the real GitHub.
 - **Effort**: M.
+- **Status**: ✅ completed (27 unit tests + 1 opt-in integration test pass).
 
 ## T-05 — Check loader
 
