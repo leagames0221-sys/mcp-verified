@@ -109,11 +109,13 @@
 
 ## T-11 — Verdict aggregator
 
-- **Boundary**: `mcp_verified/verdict/aggregator.py` — `list[Finding]` → `verdict ∈ {verified, caution, risky, unknown}` per the rule "any high → risky; any medium, no high → caution; all clean → verified; no audit completed → unknown".
+- **Boundary**: `mcp_verified/verdict/aggregator.py` exposes `aggregate_verdict(findings, *, audit_completed=True) -> str` and `findings_summary(findings) -> dict[str, int]`. Both are pure functions on iterables of `Finding`: no I/O, no global state, no module-level mutable cache. The verdict decision is exactly ADR-006: `unknown` when `audit_completed=False` (regardless of findings), `risky` if any `high` or `critical` severity is present, `caution` if any `medium`, else `verified`. `findings_summary` always returns a stable shape over the canonical buckets (`info`, `low`, `medium`, `high`, `critical`), adding an `unknown` bucket only if non-canonical severity strings are observed.
+- **Phase 1 amendment** (2026-05-29): severity comparison is case-insensitive (`HIGH` and `high` map to the same bucket) so LLM-produced finding entries from T-09 are not silently miscounted. Unknown severity strings do NOT downgrade the verdict (an LLM that returns `severity: "totally-made-up"` does not turn a clean candidate into `caution`); they are surfaced via the `findings_summary["unknown"]` bucket so the aberration is recorded without changing the tier.
 - **Depends**: (none of the executors; pure function on `Finding` objects).
 - **AC**: F-002 verdict semantics; AC-2.2.
-- **Verify**: unit test covering all four verdict branches with hand-built `Finding` lists.
+- **Verify**: 25 unit tests covering all four verdict branches (verified, caution, risky, unknown), case-insensitive severity, unknown-severity-does-not-downgrade, `audit_completed=False` forces `unknown` regardless of findings, `findings_summary` zeroed buckets / counts / unknown-bucket-appears-only-when-needed, and constants integrity (`SEVERITY_ORDER`, `HIGH_SEVERITIES`, `MEDIUM_SEVERITIES`, `VERDICTS` tuple, four verdict values are the plain words exactly).
 - **Effort**: S.
+- **Status**: ✅ completed (25 unit tests pass; cumulative 204 unit + 2 opt-in integration).
 
 ## T-12 — Divergence detector
 
