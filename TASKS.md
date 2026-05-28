@@ -60,11 +60,13 @@
 
 ## T-06 — Deterministic check executor
 
-- **Boundary**: `mcp_verified/checks/executors/deterministic.py` — regex / AST / semgrep-style pattern match against the cloned tree. Returns `list[Finding]` with severity, CWE, file:line, snippet. No LLM call.
+- **Boundary**: `mcp_verified/checks/executors/deterministic.py` — regex pattern match over the cloned tree, with a deterministic file walker (lex-sorted, skip-dir set, extension allowlist, configurable max-file-size). Returns `list[Finding]` with severity, CWE, file:line, redacted snippet. No LLM call.
+- **Phase 1 amendment** (2026-05-29): Phase 1 ships regex-only; AST / semgrep-style matchers were considered and deferred. Default rule set covers seven patterns: OpenAI / Anthropic / AWS credential shapes (CWE-798), hard-coded password literal (CWE-798), `eval()` and `exec()` calls (CWE-95), and `shell=True` invocations (CWE-78). Credential matches are length-tagged and head-truncated (`[REDACTED-N]`) before being written to a finding; non-credential matches are kept intact for assessment context. The pattern set is overridable via `DeterministicExecutor(patterns=...)` so per-check markdown definitions can supply their own rules in a later task.
 - **Depends**: T-04, T-05.
 - **AC**: AC-1.3, AC-2.2.
-- **Verify**: unit test against a "vulnerable fixture" tree that triggers each rule at least once; unit test against a "clean fixture" tree that produces zero findings.
+- **Verify**: vulnerable fixture (`VULNERABLE_PY` with one of every default rule) asserts each rule_id appears in the result; clean fixture (`CLEAN_PY`) asserts zero findings; redaction tests assert credentials never appear in `redacted_snippet`; CWE-per-rule assertion; determinism (two runs produce identical output); walker tests cover skip-dirs (`.git/`, `node_modules/`), unrecognized extensions, oversized files, undecodable UTF-8, and missing root.
 - **Effort**: M.
+- **Status**: ✅ completed (17 unit tests pass).
 
 ## T-07 — Provider ABC + Ollama + mock
 
