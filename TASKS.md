@@ -119,11 +119,13 @@
 
 ## T-12 — Divergence detector
 
-- **Boundary**: `mcp_verified/verdict/divergence.py` — read prior `audit-manifest.json` for the same `(target.repo_url, target.commit_hash)`; if the prior verdict differs from the current one, write `discrepancy.md` alongside the new `security-assessment.md`.
-- **Depends**: T-11, T-13.
+- **Boundary**: `mcp_verified/verdict/divergence.py` exposes `detect_divergence(prior_manifest, current_manifest, *, prior_verdict=None, current_verdict=None) -> DivergenceReport | None`, `find_latest_prior_audit(target_dir, current_audit_id=None) -> Path | None`, `render_discrepancy_md(report) -> str`, `write_discrepancy_md(report, path) -> Path`, and a small `load_manifest(path)` convenience reader. Detection returns `None` when the two top-level verdicts agree; same-verdict-with-different-finding-counts is treated as expected churn and does not trip the gate.
+- **Phase 1 amendment** (2026-05-29): the detector also reads the verdict directly from `audit_metadata.verdict` in the manifest, so this module can run against any pair of manifests on disk without the pipeline needing to thread the verdict through separately. Missing fields are surfaced as the literal string `"(unknown)"` rather than raised, so partial / older manifests stay diff-able.
+- **Depends**: T-11. (T-13 was originally listed as a dependency because the manifest schema lives there; T-12 now consumes the manifest as a plain dict so the cycle is broken — T-13 will produce manifests that T-12 already knows how to read.)
 - **AC**: AC-2.5.
-- **Verify**: unit test against a fixture with a fake prior run that has a different verdict; asserts `discrepancy.md` is written with the documented field set.
+- **Verify**: 16 unit tests covering `detect_divergence` (same verdict returns None, different verdict produces report, explicit kwargs override manifest, target fields pulled from current, missing prior verdict surfaces as `"(unknown)"` marker, missing findings_summary becomes empty dict), `find_latest_prior_audit` (no audits dir, empty audits dir, only audit, lex-latest, excludes current audit id), discrepancy markdown (includes target + verdicts + audit ids, idempotent render, write creates file with parent dirs), and `load_manifest` (reads JSON into dict, raises ValueError on non-object).
 - **Effort**: S.
+- **Status**: ✅ completed (16 unit tests pass; cumulative 220 unit + 2 opt-in integration).
 
 ## T-13 — Output writer (manifest + assessment + findings)
 
