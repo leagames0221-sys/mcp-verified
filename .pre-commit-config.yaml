@@ -1,0 +1,48 @@
+# Pre-commit hook chain (Layer 2 of 4-layer defense).
+# Layer 1 = client-side write-time guard (configured outside the repo).
+# Layer 2 = this file (pre-commit, runs on `git commit`).
+# Layer 3 = .github/workflows/secrets-scan.yml (post-push CI redundant scan).
+# Layer 4 = scripts/private_path_check.sh manual sweep before push.
+#
+# Install: pip install pre-commit && pre-commit install
+
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  - repo: local
+    hooks:
+      - id: private-path-check
+        name: Private path / internal-name leak guard
+        entry: bash scripts/private_path_check.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: license-audit
+        name: Dependency license audit (MIT/Apache 2.0/BSD/ISC only)
+        entry: python scripts/audit_deps.py
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false
+        stages: [pre-commit]
