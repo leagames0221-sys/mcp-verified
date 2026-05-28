@@ -11,3 +11,4 @@ Nygard-format ADRs. Each record has four canonical sections: **Status**, **Conte
 | [ADR-005](ADR-005-audit-db-schema-compat.md) | Output schema: compatible with Cloud Security Alliance `audit-db` for Phase 1.5 upstream contribution | Accepted |
 | [ADR-006](ADR-006-tier-verdict-naming.md) | Tier verdict naming: `verified` / `caution` / `risky` / `unknown` (plain words, not ordinal stars) | Accepted |
 | [ADR-007](ADR-007-mcpserver-audit-checks-fork.md) | Check seed: fork `mcpserver-audit/checks/` under Apache 2.0 with attribution preserved | Accepted |
+| [ADR-008](ADR-008-phase1-popularity-signal.md) | Phase 1 popularity signal: registry recency only (GitHub-stars enrichment deferred to Phase 1.5) | Accepted |

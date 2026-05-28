@@ -31,11 +31,13 @@
 
 ## T-03 — Discovery / popularity scoring
 
-- **Boundary**: `mcp_verified/discovery/candidates.py` — given `list[RegistryEntry]`, score each by a documented signal (default: GitHub stars × log10(downloads) with a freshness penalty) and return the top-N. Score formula is pinned in a docstring; any change requires bumping a docstring revision and recording it in `audit-manifest.json`.
+- **Boundary**: `mcp_verified/discovery/candidates.py` — given `list[RegistryEntry]`, score each by a documented signal and return the top-N. Score formula is pinned in a module constant (`SCORE_FORMULA_REVISION`); any change requires bumping the constant and recording it in `audit-manifest.json`.
+- **Phase 1 amendment** (2026-05-29): the live registry exposes no `downloads` / `stars` / `popularity` field (probe recorded at `docs/evidence/2026-05-29-registry-no-popularity-signal-probe.md`). [ADR-008](docs/adr/ADR-008-phase1-popularity-signal.md) adopts a registry-recency-only formula `1.0 / (1.0 + days_since(updatedAt) / 30.0)` (revision `phase1-v1`); GitHub-stars enrichment is deferred to Phase 1.5.
 - **Depends**: T-02.
 - **AC**: AC-1.2.
 - **Verify**: unit test that two runs on the same input return identical ordering; unit test that ties are broken deterministically by repository slug.
 - **Effort**: S.
+- **Status**: ✅ completed (30 unit tests pass, ADR-008 + evidence land).
 
 ## T-04 — Safe read-only clone
 
