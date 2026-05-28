@@ -70,11 +70,12 @@
 
 ## T-07 — Provider ABC + Ollama + mock
 
-- **Boundary**: `mcp_verified/providers/base.py` defines the ABC `query(prompt: str, schema: dict) -> dict`. `mcp_verified/providers/ollama.py` posts to `http://localhost:11434/api/chat` with `temperature=0`, parses the response as JSON, validates against `schema`. `mcp_verified/providers/mock.py` returns an empty-finding object that validates against `schema`. Mock is the active provider when the configured provider is unreachable (catch `ConnectionError`).
+- **Boundary**: `mcp_verified/providers/base.py` defines the `Provider` ABC (`query(prompt, schema) -> dict`) plus the exception hierarchy (`ProviderError`, `ProviderUnreachableError`, `ProviderResponseError`) and the `query_with_fallback()` helper that swaps to mock on `ProviderUnreachableError`. `mcp_verified/providers/ollama.py` posts to `<base>/api/chat` with `format: json`, `stream: false`, configurable `model` (default `gemma3:4b` per ADR-004) and `temperature` (default 0), uses stdlib `urllib` only, and surfaces connection failures as `ProviderUnreachableError` and parse failures as `ProviderResponseError`. `mcp_verified/providers/mock.py` returns a freshly-built `{"findings": []}` object every call so downstream mutations cannot bleed into other callers.
 - **Depends**: T-01.
 - **AC**: AC-3.1, AC-3.2, AC-3.3.
-- **Verify**: unit test of `ollama.query` against a recorded HTTP fixture (`responses` library or stdlib `http.server`); unit test that mock provider returns the documented empty-finding object; unit test that an unreachable provider triggers mock fallback.
+- **Verify**: 19 unit tests covering MockProvider (empty findings, isolated copy, name, ABC membership, zero network call); OllamaProvider happy path against a stdlib `http.server` fixture (parsed content, payload pins `format: json` + `stream: false` + `temperature 0.0` + default model, custom model and temperature propagate); OllamaProvider error paths (unreachable raises `ProviderUnreachableError`, non-JSON envelope and missing `message` and non-JSON content and non-object content all raise `ProviderResponseError`); defaults sanity check; `query_with_fallback` returns primary on success, swaps to fallback on unreachable, does not swallow `ProviderResponseError`; ABC cannot be instantiated; error hierarchy verified.
 - **Effort**: M.
+- **Status**: ✅ completed (19 unit tests pass; cumulative 134 unit + 2 opt-in integration).
 
 ## T-08 — Paid providers (refused-by-default)
 
