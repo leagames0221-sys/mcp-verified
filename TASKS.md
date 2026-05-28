@@ -79,11 +79,13 @@
 
 ## T-08 — Paid providers (refused-by-default)
 
-- **Boundary**: `mcp_verified/providers/{anthropic,openai,gemini}.py` — same ABC as Ollama, but `query` checks `os.environ["MCP_VERIFIED_PAID_PROVIDER_OPT_IN"]`; if not equal to `"1"`, raise `PaidProviderRefusedError` regardless of whether the vendor's API key is present.
+- **Boundary**: `mcp_verified/providers/{anthropic,openai,gemini}.py` extend `_PaidProviderBase` (in `_paid.py`), which provides shared HTTP plumbing and a single-line `assert_paid_opt_in(self.name)` gate at the top of every `query` call. The gate raises `PaidProviderRefusedError` unless `MCP_VERIFIED_PAID_PROVIDER_OPT_IN=1` is set; if the opt-in is granted but the vendor's key env var is missing, `PaidProviderMissingKeyError` is raised instead. Each subclass implements four hooks (`_endpoint_url`, `_headers`, `_payload`, `_extract_content`) so vendor differences (header auth vs. URL auth, message vs. choices vs. candidates response shape, max_tokens vs. response_format vs. responseMimeType structured-output knobs) are isolated to ~50 LoC per vendor.
+- **Phase 1 amendment** (2026-05-29): default models pinned for Phase 1 are `claude-haiku-4-5-20251001`, `gpt-5-mini`, and `gemini-2.5-flash` — the cost-conscious tier at each vendor, so a reviewer who opts in does not accidentally burn the Opus / GPT-5 / Gemini-2.5-Pro budget on a single audit run.
 - **Depends**: T-07.
 - **AC**: AC-3.5, AC-4.4.
-- **Verify**: unit test that each paid provider refuses without the opt-in env var even when the key env var is set; unit test that with both env vars set, the provider proceeds (mock the HTTP layer).
+- **Verify**: 21 unit tests — `assert_paid_opt_in` gate (missing / wrong value / correct value); parametrized refused-without-opt-in tests for all three vendors with the key env var set (the gate must fire regardless); parametrized refused-with-wrong-opt-in-value tests; parametrized missing-key-when-opted-in tests; parametrized happy-path tests with `urllib.request.urlopen` monkeypatched to a fixture response, asserting the parsed content surfaces; vendor-specific request-shape tests (Anthropic carries `x-api-key` + `anthropic-version` headers and `model` + `messages` body; OpenAI carries `Authorization: Bearer` and `response_format: json_object` + `temperature: 0`; Gemini carries the key in the URL query string and `responseMimeType: application/json` in `generationConfig`); error hierarchy verification.
 - **Effort**: S.
+- **Status**: ✅ completed (21 unit tests pass; cumulative 155 unit + 2 opt-in integration).
 
 ## T-09 — LLM-assisted check executor
 
