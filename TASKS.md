@@ -129,11 +129,17 @@
 
 ## T-13 — Output writer (manifest + assessment + findings)
 
-- **Boundary**: `mcp_verified/output/{manifest,assessment,findings}.py` — write the per-server directory tree per AC-2.1, AC-2.2, AC-2.3, AC-2.4 with the exact `audit-db` schema.
+- **Boundary**: four cooperating modules under `mcp_verified/output/` produce the full `audit-db`-compatible directory tree from one `AuditManifest` + `list[Finding]` pair:
+  - `manifest.py` — `Auditor`, `Target`, `AuditMetadata`, `AuditManifest` frozen dataclasses mirroring the upstream schema; `write_manifest_json()` emits sorted-key 2-space-indented JSON so two runs of the same audit are byte-identical (critical for T-12 divergence detection).
+  - `findings.py` — `slugify()` + `finding_filename()` + `render_finding_md()` + `write_findings_dir()`; per-severity zero-padded NNN sequence (`high-001-...`, `high-002-...`, `medium-001-...`).
+  - `assessment.py` — `render_assessment_md()` + `write_assessment_md()`; markdown table with target, audit id, verdict, status, time spent, per-severity counts, and a per-finding rule / severity / location / CWE row.
+  - `writer.py` — `AuditDirWriter(root_dir).write(manifest, findings)` orchestrates everything: creates `<root>/audits/<host>/<owner>/<repo>/audits/<audit_id>/{audit-manifest.json, security-assessment.md, findings/}` and updates the per-target `<root>/audits/<host>/<owner>/<repo>/metadata.json` aggregate with the latest verdict, latest audit id, audit count, and the full sorted list of audit ids.
+- **Phase 1 amendment** (2026-05-29): `target_host_owner_repo()` decomposes `https://github.com/<owner>/<repo>[.git]` URLs into `(host, owner, repo)` and strips trailing `.git` so the per-target directory is shared across an audit run that fetched the bare repo URL and one that fetched the `.git` form. The schema validation step originally planned against a pinned upstream commit is replaced with structural unit tests (deterministic JSON bytes, sorted keys, key set, per-severity finding filename format) — running the upstream `validate-audit.py` against the produced tree is moved to T-14 (the `export-audit-db` subcommand) and to Phase 1.5 dogfood (T-21).
 - **Depends**: T-11.
 - **AC**: AC-2.1, AC-2.2, AC-2.3, AC-2.4, AC-5.5, AC-6.1.
-- **Verify**: integration test that writes a fixture verdict and validates the resulting JSON against the upstream `audit-db` schema (pinned commit hash in ADR-005); shape-test of `findings/<severity>-<NNN>-<slug>.md` naming.
+- **Verify**: 23 unit tests — `slugify` (lowercase / hyphenate / collapse non-alphanumeric / trim / empty fallback / truncate); `finding_filename` (format + zero-padded sequence); manifest writer (`to_manifest_dict` round-trips every field; `write_manifest_json` is deterministic across two writes; top-level keys are sorted); findings dir (per-severity sequence numbering; rendered markdown contains rule_id / severity / CWE / location / redacted snippet); assessment renderer (target / verdict / findings table; empty-findings branch); `AuditDirWriter` (full directory tree creates 4 artifacts; target metadata.json records latest verdict and id across two writes; audit dir path layout matches `audits/<host>/<owner>/<repo>/audits/<audit_id>/`); `target_host_owner_repo` URL decomposition (canonical / .git-suffixed / trailing-slash / invalid URLs).
 - **Effort**: M.
+- **Status**: ✅ completed (23 unit tests pass; cumulative 243 unit + 2 opt-in integration).
 
 ## T-14 — `export-audit-db` subcommand
 
