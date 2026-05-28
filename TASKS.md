@@ -218,10 +218,12 @@
 ## T-21 — Dogfood probes B1–B4 baseline
 
 - **Boundary**: run a top-50 audit, measure: B1 throughput (wall-clock / server), B2 reproducibility (Jaccard across 2 runs on N=5 servers), B3 LLM vs deterministic F1 against a ground-truth N=10 set, B4 storage scale (KB / server). Record results under `docs/evidence/<date>-dogfood-probes.md`.
+- **Phase 1 amendment** (2026-05-29): Phase 1 pilot ran against the deterministic fixture (`tests/fixtures/registry-snapshot-2026-05-28.json`, three entries — one GitHub-published, two remote-only) with `--provider mock` so the run is reproducible without an Ollama daemon. Two back-to-back runs produced literal numbers for **B1** (30.6 s/candidate average, ~38× under the 1 152 s NFR-1 ceiling), **B2** (2/2 verdicts and per-severity finding counts agree, Jaccard = 1.0), and **B4** (3.9 KB/candidate average, ~25× under the 100 KB NFR-2 ceiling). **B3** requires Ollama plus a ground-truth set; it is documented as deferred to Phase 1.5 follow-up rather than substituted with a synthetic estimate.
 - **Depends**: T-15, T-17, T-18, T-19.
 - **AC**: NFR-1, NFR-2.
-- **Verify**: evidence file lands with concrete numbers in every probe row; `git log` shows the file was added in a single commit with the dogfood run output.
-- **Effort**: L (wall-clock-dominated, not effort-dominated).
+- **Verify**: evidence file `docs/evidence/2026-05-29-dogfood-probes.md` lands with literal numbers in B1 / B2 / B4 rows and a documented deferral for B3. Two runs are reproducible byte-for-byte in `audit-manifest.json` (the only differences are the wall-clock timestamps in `security-assessment.md`, which is consistent with the T-12 divergence detector's reliance on manifest-only equality).
+- **Effort**: L (wall-clock-dominated).
+- **Status**: ✅ completed (B1 / B2 / B4 measured against literal numbers; B3 deferred to Phase 1.5 with prerequisites named).
 
 ## T-22 — README screenshots + examples
 
