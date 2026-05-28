@@ -66,3 +66,4 @@ select = [
 minversion = "8.3"
 addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"

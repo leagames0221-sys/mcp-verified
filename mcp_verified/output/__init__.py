@@ -1,6 +1,7 @@
 """Output writer subpackage: emits the audit-db-compatible directory tree."""
 
 from mcp_verified.output.assessment import render_assessment_md, write_assessment_md
+from mcp_verified.output.exporter import ExportError, export_audit_db_target
 from mcp_verified.output.findings import (
     finding_filename,
     render_finding_md,
@@ -22,7 +23,9 @@ __all__ = [
     "AuditManifest",
     "AuditMetadata",
     "Auditor",
+    "ExportError",
     "Target",
+    "export_audit_db_target",
     "finding_filename",
     "render_assessment_md",
     "render_finding_md",

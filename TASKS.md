@@ -143,11 +143,13 @@
 
 ## T-14 — `export-audit-db` subcommand
 
-- **Boundary**: `mcp_verified/output/exporter.py` — given a target repo's audit directory, emit a tarball laid out exactly as an `audit-db` PR expects.
+- **Boundary**: `mcp_verified/output/exporter.py` exposes `export_audit_db_target(target_dir, output_path, *, host=None, owner=None, repo=None, deterministic_mtime=0) -> Path` and an `ExportError` exception type. Walks the target's audit subtree under lex-sorted order and writes a `.tar.gz` whose internal layout is `audits/<host>/<owner>/<repo>/...`. Uses stdlib `tarfile` only — no new runtime dependency.
+- **Phase 1 amendment** (2026-05-29): every tar entry carries `mtime=0`, `uid=0`, `gid=0`, empty `uname` / `gname`, and canonical 0644 / 0755 modes so the tar payload is byte-deterministic across machines. The outer gzip header may still embed a default filesystem timestamp; tests assert structural equality by extracting and comparing the tree, not by hashing the raw tarball bytes. Host / owner / repo can be supplied explicitly to override the inference (so the same audit data can be exported under a renamed namespace if a fork relocates) or left unset to inherit from the last three components of `target_dir`.
 - **Depends**: T-13.
 - **AC**: AC-6.3.
-- **Verify**: integration test that runs `mcp-verified export-audit-db <fixture-target>`, extracts the tarball, and asserts the directory tree matches an upstream-schema-validated reference layout.
+- **Verify**: 10 unit tests covering the happy path (export → extract → assert directory tree matches the expected `audits/<host>/<owner>/<repo>/{metadata.json, audits/<audit_id>/{audit-manifest.json, security-assessment.md, findings/}}` layout; returns the output path); determinism (two exports produce identical `(name, size, mtime, mode, uid, gid)` member tables and identical concatenated payload bytes; default `mtime=0` is honored); host/owner/repo override + inference paths; error paths (missing target raises `ExportError`, target-is-file raises); output parent directory creation. Upstream `validate-audit.py` invocation is deferred to Phase 1.5 dogfood (T-21) when a real audit run is available.
 - **Effort**: S.
+- **Status**: ✅ completed (10 unit tests pass; cumulative 253 unit + 2 opt-in integration).
 
 ## T-15 — CLI entry point
 
