@@ -237,11 +237,12 @@
 
 ## T-23 — v0.1.0 tag
 
-- **Boundary**: bump `pyproject.toml` and `mcp_verified/__init__.py` to `0.1.0`; update CHANGELOG.md; create annotated tag `v0.1.0`; push tag.
+- **Boundary**: bump `pyproject.toml` and `mcp_verified/__init__.py` to `0.1.0`; update CHANGELOG.md with the Phase 1 source-complete release notes; promote `Development Status` classifier from Pre-Alpha to Alpha; create annotated tag `v0.1.0` with a release-notes summary; push the tag and the corresponding GitHub release.
 - **Depends**: T-19, T-20, T-21, T-22.
 - **AC**: (release milestone).
-- **Verify**: `gh release view v0.1.0` returns the expected metadata; `git tag` lists `v0.1.0`.
+- **Verify**: `git tag -l` lists `v0.1.0`; `gh release view v0.1.0` returns the release at <https://github.com/leagames0221-sys/mcp-verified/releases/tag/v0.1.0>; `git show v0.1.0` shows the annotated tag content; `python -m mcp_verified.cli version` prints `0.1.0`.
 - **Effort**: S.
+- **Status**: ✅ completed (tag pushed, GitHub release created at commit `791f8eb`).
 
 ---
 
