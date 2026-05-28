@@ -99,11 +99,13 @@
 
 ## T-10 — Per-server budget enforcer
 
-- **Boundary**: `mcp_verified/budget/per_server.py` — wrap an audit run in a `signal.alarm(300)` (Linux) / `concurrent.futures.TimeoutError` (Windows) with cleanup on timeout. On timeout, emit a `timeout` finding and continue with the next candidate.
+- **Boundary**: `mcp_verified/budget/per_server.py` exposes `run_with_budget(work, *, timeout_seconds=300)` returning a `BudgetResult(completed, value, elapsed_seconds)` and a `timeout_finding(timeout_seconds, *, candidate=...)` helper that yields the synthetic `CHECK-RUN-TIMEOUT` Finding (severity `info`, no CWE) recorded against a candidate that hit the cap.
+- **Phase 1 amendment** (2026-05-29): the implementation uses `concurrent.futures.ThreadPoolExecutor` rather than POSIX `signal.alarm` so Windows is supported on equal footing. `shutdown(wait=False)` returns control to the caller immediately even when the stuck worker thread is still draining I/O; production audit loops can move to the next candidate without blocking. The worker thread is non-daemon (an stdlib limitation) so process exit waits for it; long-lived audit processes release the reference once the result is consumed.
 - **Depends**: T-04.
 - **AC**: AC-1.5.
-- **Verify**: unit test that a deliberately slow check (`time.sleep(310)` mock) aborts at 300 s ± 5 s; unit test that the timeout finding is recorded with the right severity.
+- **Verify**: 10 unit tests covering the happy path (fast work returns; elapsed is small; exceptions propagate); timeout path (slow work returns `BudgetResult(completed=False, value=None)`; timeout never raises); validation (zero or negative timeout raises `ValueError`); and `timeout_finding` shape (rule_id, severity, default-budget-matches-constant, candidate-included-in-description).
 - **Effort**: S.
+- **Status**: ✅ completed (10 unit tests pass; cumulative 179 unit + 2 opt-in integration).
 
 ## T-11 — Verdict aggregator
 
