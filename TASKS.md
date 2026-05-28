@@ -227,11 +227,13 @@
 
 ## T-22 — README screenshots + examples
 
-- **Boundary**: `docs/demo/` — capture CLI output via `asciinema rec` → PNG via documented render path, embed in README. Add an `examples/quickstart.md` that walks through `mcp-verified audit --top 5`.
+- **Boundary**: `docs/demo/cli/` holds the recorded CLI outputs (`version.txt`, `help.txt`, `audit-help.txt`, `audit-sample.txt`, `sample-security-assessment.md`). `docs/demo/sample-audit/` holds a real audit-directory tree from a fixture-based run. `examples/quickstart.md` is a five-command walkthrough (clone + install + version + audit + browse) targeting under 10 minutes from a fresh clone on a 16 GB consumer laptop. README's Quickstart section is rewritten to the same five-command short form.
+- **Phase 1 amendment** (2026-05-29): Phase 1 ships text captures + a sample directory tree rather than PNG screenshots. PNG rendering (Pillow + render script) is a Phase 1.5 follow-up; text captures render correctly on GitHub markdown and copy-paste cleanly. `docs/demo/runs/` (transient outputs) is `.gitignore`'d.
 - **Depends**: T-15, T-21.
 - **AC**: NFR-3.
-- **Verify**: README renders correctly on GitHub PRIVATE; example commands copy-paste-runnable.
+- **Verify**: README renders correctly on GitHub PRIVATE; example commands copy-paste-runnable via `--fixture` so a reviewer with no Ollama and no network can still complete the walkthrough; `docs/demo/sample-audit/` mirrors the audit-db schema for both an audited (risky) candidate and an unknown (remote-only) candidate.
 - **Effort**: S.
+- **Status**: ✅ completed (CLI captures + sample audit tree + quickstart land; PNG rendering deferred to Phase 1.5).
 
 ## T-23 — v0.1.0 tag
 
