@@ -163,11 +163,13 @@
 
 ## T-16 — Integrity hashing
 
-- **Boundary**: `mcp_verified/integrity/hash.py` — SHA-256 of cloned tree commit, SHA-256 of each check file used. Emitted under `audit-manifest.json` `audit_metadata.integrity`.
+- **Boundary**: `mcp_verified/integrity/hash.py` exposes `sha256_bytes`, `sha256_path`, `sha256_tree` (chunked file read, lex-sorted directory walk, deterministic content hash that includes per-file relative path + 8-byte big-endian size + bytes), and `build_integrity(*, tree_commit, tree_root, checks, tool_version)` which composes the `audit_metadata.integrity` block. The pipeline (T-15) is updated to call `build_integrity` for completed audits and embed `{tree_commit, tree_sha256, checks: {check_id: sha256}, mcp_verified_version}` instead of the prior `{tree_commit}` placeholder.
+- **Phase 1 amendment** (2026-05-29): `sha256_tree` skips `.git/` by default (the index does not contribute to the source-content claim a verdict makes about a repository) and exposes a `skip_dirs` parameter so callers can additionally exclude `node_modules/` etc. on demand. `build_integrity` accepts every input as optional so unknown / timeout / clone-failure paths can still produce a partial integrity block with just `mcp_verified_version`; absent inputs simply yield absent fields rather than throwing.
 - **Depends**: T-04, T-05, T-13.
 - **AC**: AC-5.5.
-- **Verify**: unit test that hashes are deterministic across two runs against the same fixture.
+- **Verify**: 16 unit tests — sha256_bytes matches stdlib + empty case; sha256_path matches sha256_bytes(open(path).read()) + handles large chunked files; sha256_tree deterministic across two runs, changes with content, changes with file rename, skips .git by default, honors custom skip_dirs, raises NotADirectoryError on missing root; build_integrity includes tool_version, includes tree_commit when given, includes tree_sha256 when root is provided, sorts checks alphabetically, omits optional fields when inputs are absent, omits checks key when no check has a hash.
 - **Effort**: S.
+- **Status**: ✅ completed (16 unit tests pass; cumulative 275 unit + 2 opt-in integration).
 
 ## T-17 — Check seed: fork mcpserver-audit
 

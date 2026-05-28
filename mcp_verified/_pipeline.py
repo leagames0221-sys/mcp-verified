@@ -35,6 +35,7 @@ from mcp_verified.clone.safe_clone import (
     CloneError,
     safe_clone,
 )
+from mcp_verified.integrity.hash import build_integrity
 from mcp_verified.output.assessment import write_assessment_md
 from mcp_verified.output.findings import write_findings_dir
 from mcp_verified.output.manifest import (
@@ -425,7 +426,12 @@ def audit_one(
                 status="completed",
                 time_spent_minutes=elapsed / 60.0,
                 verdict=verdict,
-                integrity={"tree_commit": commit_hash},
+                integrity=build_integrity(
+                    tree_commit=commit_hash,
+                    tree_root=repo.path,
+                    checks=config.checks,
+                    tool_version=config.project_version,
+                ),
             ),
             findings_summary=findings_summary(findings),
             tools_used=(
