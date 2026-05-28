@@ -50,11 +50,13 @@
 
 ## T-05 — Check loader
 
-- **Boundary**: `mcp_verified/checks/loader.py` — load every `.md` under `checks/` whose frontmatter declares `enabled: true`, parse the five-section structure (CWE tag, AI instructions, human steps, risk, good/bad examples), expose them as `list[CheckDefinition]`. Compute a SHA-256 per file for integrity recording.
-- **Depends**: T-01, T-17 (seed file presence).
+- **Boundary**: `mcp_verified/checks/loader.py` — load every `.md` under a checks directory, parse the frontmatter using `mcp_verified/checks/frontmatter.py`, skip files whose `status` is not `"active"`, and expose the rest as `CheckDefinition` records. Each record carries the SHA-256 of its file contents for integrity recording in `audit-manifest.json`.
+- **Phase 1 amendment** (2026-05-29): the upstream `mcpserver-audit` frontmatter uses `status: active` (not `enabled: true`); the loader follows the upstream convention. [ADR-009](docs/adr/ADR-009-pyyaml-runtime-dependency.md) records the decision to ship a hand-rolled minimal subset parser (zero new runtime dependencies) rather than adopt PyYAML, in line with the harness's supply-chain security gate.
+- **Depends**: T-01. (T-17 was originally listed as a dependency for fixture presence; the loader now ships its own minimal fixtures under `tests/fixtures/checks/` and does not need the seed.)
 - **AC**: AC-5.5, AC-6.1.
-- **Verify**: unit test that loads `tests/fixtures/checks/*.md` and asserts the expected per-file SHA-256.
+- **Verify**: unit tests load `tests/fixtures/checks/sample-active.md` and assert id, title, status, priority, cwe, cwe-primary, tags, sections, and SHA-256; deprecated-status fixture returns None; missing-frontmatter and indented-block-list fixtures raise; curated-directory test asserts deterministic id-sorted output and that disabled entries are filtered. Plus a parser-level test set covering the supported subset (scalars, inline lists, quoted strings) and explicit rejection of unsupported shapes (block lists, inline maps, anchors, duplicate keys, indented continuations).
 - **Effort**: S.
+- **Status**: ✅ completed (41 unit tests pass).
 
 ## T-06 — Deterministic check executor
 
