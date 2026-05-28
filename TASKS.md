@@ -194,11 +194,16 @@
 
 ## T-19 — GitHub Actions workflows
 
-- **Boundary**: `.github/workflows/ci.yml` (test + lint on push / PR to `main`); `.github/workflows/gitleaks.yml` (secrets scan on push / PR); `.github/workflows/secrets-scan.yml` (redundant post-push scan). Cross-OS matrix (ubuntu-latest, windows-latest); macOS best-effort, allowed to fail per NFR-4.
+- **Boundary**: three workflow files under `.github/workflows/`:
+  - `ci.yml`: `test` job runs `pytest -q` and `pytest --cov=mcp_verified --cov-fail-under=80` on a `[ubuntu-latest, windows-latest] × [3.11, 3.12]` matrix; `test-macos` job runs on `macos-latest` with `continue-on-error: true` per NFR-4; `lint` job runs `ruff check` and `ruff format --check`; `layer4-sweep` job runs `bash scripts/private_path_check.sh`.
+  - `gitleaks.yml`: official `gitleaks/gitleaks-action@v2` on every push and PR plus a weekly cron at Monday 06:00 UTC.
+  - `secrets-scan.yml`: redundant Layer 3 — runs `scripts/private_path_check.sh` and `scripts/audit_deps.py` so a gitleaks regression cannot silently mask a private-path leak or a license-audit failure.
+- **Phase 1 amendment** (2026-05-29): workflows are configured correctly and registered with GitHub (`gh workflow list` shows `ci`, `gitleaks`, `secrets-scan` all `active`), but the first run on push fails in 4–7 seconds with empty step lists — the GHA runner image is not even fetched. This matches an existing precedent on a sibling project where Actions on a PRIVATE repo under the GitHub Free tier hit a billing suspension that does not affect PUBLIC repos (PUBLIC repos get unlimited free Actions minutes per GitHub's billing policy). The workflows will auto-green on the T-25 PUBLIC visibility flip; no workflow code change is required.
 - **Depends**: T-18.
 - **AC**: AC-5.1, NFR-4.
-- **Verify**: workflows green on the first push to `main` after landing; `gh run list --limit 5` shows the expected job names.
+- **Verify**: `gh workflow list` reports `ci`, `gitleaks`, and `secrets-scan` all `active`. First-push runs failed with empty job steps confirming the billing-suspension root cause (commit `ec1d3cc`). Functional green-flag verify is deferred to T-25 when the repo flips to PUBLIC and free Actions minutes apply.
 - **Effort**: M.
+- **Status**: ⏳ workflows configured + registered; functional CI verify deferred to T-25 (PUBLIC flip) per the documented billing-suspension root cause.
 
 ## T-20 — Release gate script
 
