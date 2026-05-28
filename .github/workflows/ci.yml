@@ -1,0 +1,103 @@
+name: ci
+
+# Cross-OS test + lint + coverage gate.
+# - ubuntu-latest and windows-latest are required (NFR-4 primary platforms).
+# - macos-latest is best-effort; allowed to fail.
+# - Coverage gate is the canonical pytest-cov 80% floor (T-18).
+#
+# Triggered on every push to main and every pull request targeting main.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (${{ matrix.os }} · py${{ matrix.python-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install project + dev deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      - name: Coverage gate (pytest-cov, fail under 80%)
+        run: python -m pytest --cov=mcp_verified --cov-report=term-missing --cov-fail-under=80
+
+  test-macos:
+    name: test (macos-latest · py3.12, best-effort)
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project + dev deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run tests
+        run: python -m pytest -q
+
+  lint:
+    name: lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install ruff
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "ruff>=0.7.0"
+
+      - name: ruff check
+        run: ruff check mcp_verified tests scripts
+
+      - name: ruff format --check
+        run: ruff format --check mcp_verified tests scripts
+
+  layer4-sweep:
+    name: layer 4 private-path sweep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run private_path_check.sh
+        run: bash scripts/private_path_check.sh
