@@ -191,8 +191,8 @@ flip to actually run.
 ### Known limitations
 
 - Phase 1 audits only registry entries whose source is published on
-  GitHub (~84.6% of the registry per the public-source rate observed
-  in February 2026). Non-GitHub entries get the `unknown` verdict.
+  GitHub (the majority of the registry; a firsthand public-source rate
+  is a Phase 1.5 deliverable). Non-GitHub entries get the `unknown` verdict.
 - Phase 1 throughput, reproducibility, and storage metrics are
   measured against a deterministic 3-entry fixture. Top-50 against
   the live registry under Ollama is a Phase 1.5 follow-up.

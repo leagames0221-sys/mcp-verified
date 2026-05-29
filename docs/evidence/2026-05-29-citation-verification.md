@@ -26,12 +26,16 @@ spec, and ADR canon. Performed during the pre-public portfolio quality gate.
 - **Verified**: the source is real and is the origin of the "41% lack
   authentication" figure (consistent with the v0.2.0-design threat-surface
   notes). Total surveyed: **518 servers** in the official MCP registry.
-- **Open item (honest)**: the exact "84.6% GitHub-hosted source" figure
-  cited in README Limitations and ADR-002 could **not** be byte-verified
-  here — the blog returns HTTP 403 to automated fetches. Before relying on
-  the precise percentage in public docs, confirm it against the article in
-  a browser and quote the relevant line here. The figure is currently
-  presented as attributed, not independently re-measured.
+- **Resolved by softening**: the exact "84.6% GitHub-hosted source" figure
+  previously cited in README Limitations, ADR-002, and the CHANGELOG could
+  **not** be byte-verified — the blog returns HTTP 403 to automated fetches,
+  the Wayback snapshot was unreachable, and a targeted search did not surface
+  the specific percentage. Rather than keep an unverifiable precise number in
+  public docs (which would undercut this project's "measure it firsthand"
+  stance), the three references were reworded to the qualitative "the majority
+  of registry entries", with the firsthand public-source rate deferred to the
+  Phase 1.5 Top-50 pilot. The earezki source itself (518 servers, 41% no-auth)
+  remains verified and attributed.
 
 ## Equixly figures (43% / 22% / 30%)
 

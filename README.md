@@ -67,7 +67,7 @@ Recorded CLI captures and a sample verdict registry tree live under
 
 ## Limitations
 
-- Phase 1 covers servers whose source is published on GitHub (84.6% of registry entries per the public-source-publication rate observed in February 2026). Servers with no public source are reported as `unknown` with no further analysis.
+- Phase 1 covers servers whose source is published on GitHub (the majority of registry entries; a firsthand public-source rate is one of the Phase 1.5 Top-50 pilot deliverables rather than a borrowed figure). Servers with no public source are reported as `unknown` with no further analysis.
 - Read-only static analysis only. Dynamic vulnerabilities that require execution (race conditions, runtime injection) are out of scope for Phase 1.
 - Tier verdicts are reproducibility-stable, not "correctness" claims. A `verified` verdict means the server passed the published check set, not that no vulnerability exists.
 - Phase 1 audits a curated subset (top 50 by popularity) rather than the full registry. Full-registry coverage is deferred to Phase 2 pending throughput probe results.

@@ -23,7 +23,7 @@ For **Phase 1**, the only data source is **`registry.modelcontextprotocol.io`**.
 
 1. Resolve the registry's public list endpoint (currently under documentation; the resolved endpoint is recorded under `docs/evidence/` once probed).
 2. Cache the inventory locally with a documented TTL.
-3. Operate only on entries whose published `repository_url` is on GitHub (~84.6% of the inventory per the public-source-publication rate from earezki, 2026-02).
+3. Operate only on entries whose published `repository_url` is on GitHub (the majority of the inventory per earezki's Feb-2026 scan of 518 servers; the exact public-source rate is deferred to a firsthand Phase 1.5 measurement rather than cited as fact).
 4. Defer all non-GitHub and non-official-registry entries to a Phase ≥ 2 backlog.
 
 ## Consequences
