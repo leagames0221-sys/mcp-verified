@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Portfolio quality gate (2026-05-29)
+
+- **Fixed** — corrected the arXiv:2510.16558 author citation from
+  "Wang et al." to "Li and Gao" across README, spec, ADR-002, ADR-011,
+  and `checks/ATTRIBUTION.md` (verified against the arXiv abstract: the
+  paper has exactly two authors, Xiaofan Li and Xing Gao).
+- **Added** — `## Why this exists` narrative (motivation → approach →
+  result) and a `## Demo` section with a rendered terminal screenshot
+  (`docs/demo/quickstart.png`), generated from real CLI output by
+  `scripts/render_demo.py` (Pillow-only, docs/dev tool).
+- **Added** — `.gitattributes` forcing LF on shell scripts so the
+  release gate and its tests run after a Windows clone.
+
 ### Added — design v0.2.0-design (2026-05-29, post-deep-research)
 
 Spec / ADR / check-set upgrade grounded in the
