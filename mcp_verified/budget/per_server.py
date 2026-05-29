@@ -21,10 +21,11 @@ POSIX `signal.alarm`.
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _FuturesTimeoutError
 from dataclasses import dataclass
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from mcp_verified.checks.executors.deterministic import Finding
 

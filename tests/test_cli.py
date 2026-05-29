@@ -11,7 +11,6 @@ import pytest
 
 from mcp_verified.cli import main
 
-
 FIXTURE_PAYLOAD = {
     "servers": [
         {
@@ -142,9 +141,7 @@ class TestArgParsing:
         with pytest.raises(SystemExit):
             main([])
 
-    def test_unknown_provider_exits_nonzero(
-        self, tmp_path: Path, fixture_path: Path
-    ) -> None:
+    def test_unknown_provider_exits_nonzero(self, tmp_path: Path, fixture_path: Path) -> None:
         with pytest.raises(SystemExit):
             main(
                 [

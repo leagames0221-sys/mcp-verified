@@ -121,9 +121,7 @@ def parse_frontmatter(text: str) -> Frontmatter:
             )
         match = _KEY_VALUE_PATTERN.match(stripped)
         if match is None:
-            raise FrontmatterParseError(
-                f"line {line_number} does not match 'key: value': {line!r}"
-            )
+            raise FrontmatterParseError(f"line {line_number} does not match 'key: value': {line!r}")
         key, value = match.group(1), match.group(2)
         if key in fields:
             raise FrontmatterParseError(f"duplicate key {key!r} at line {line_number}")

@@ -96,9 +96,7 @@ class OllamaProvider(Provider):
         try:
             envelope = json.loads(body_bytes)
         except json.JSONDecodeError as exc:
-            raise ProviderResponseError(
-                f"Ollama response envelope is not JSON: {exc}"
-            ) from exc
+            raise ProviderResponseError(f"Ollama response envelope is not JSON: {exc}") from exc
 
         if not isinstance(envelope, dict):
             raise ProviderResponseError(
@@ -107,22 +105,16 @@ class OllamaProvider(Provider):
 
         message = envelope.get("message")
         if not isinstance(message, dict):
-            raise ProviderResponseError(
-                "Ollama response missing 'message' object"
-            )
+            raise ProviderResponseError("Ollama response missing 'message' object")
 
         content = message.get("content")
         if not isinstance(content, str):
-            raise ProviderResponseError(
-                "Ollama response message.content is not a string"
-            )
+            raise ProviderResponseError("Ollama response message.content is not a string")
 
         try:
             parsed = json.loads(content)
         except json.JSONDecodeError as exc:
-            raise ProviderResponseError(
-                f"Ollama message.content is not JSON: {exc}"
-            ) from exc
+            raise ProviderResponseError(f"Ollama message.content is not JSON: {exc}") from exc
 
         if not isinstance(parsed, dict):
             raise ProviderResponseError(

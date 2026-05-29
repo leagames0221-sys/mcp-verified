@@ -71,10 +71,7 @@ class TestAggregateVerdict:
 
     def test_audit_not_completed_yields_unknown(self) -> None:
         # Even with high findings, audit_completed=False forces unknown.
-        assert (
-            aggregate_verdict([_finding("high")], audit_completed=False)
-            == VERDICT_UNKNOWN
-        )
+        assert aggregate_verdict([_finding("high")], audit_completed=False) == VERDICT_UNKNOWN
 
     def test_audit_not_completed_with_no_findings_yields_unknown(self) -> None:
         assert aggregate_verdict([], audit_completed=False) == VERDICT_UNKNOWN
@@ -86,9 +83,7 @@ class TestAggregateVerdict:
     def test_unknown_severity_does_not_downgrade(self) -> None:
         """An unrecognized severity string should be ignored by the
         decision (the bucket is unknown, not high or medium)."""
-        assert (
-            aggregate_verdict([_finding("totally-made-up")]) == VERDICT_VERIFIED
-        )
+        assert aggregate_verdict([_finding("totally-made-up")]) == VERDICT_VERIFIED
 
 
 # ---------- findings_summary ----------
@@ -140,10 +135,10 @@ class TestConstants:
         assert SEVERITY_ORDER == ("info", "low", "medium", "high", "critical")
 
     def test_high_severities_set(self) -> None:
-        assert HIGH_SEVERITIES == frozenset({"high", "critical"})
+        assert frozenset({"high", "critical"}) == HIGH_SEVERITIES
 
     def test_medium_severities_set(self) -> None:
-        assert MEDIUM_SEVERITIES == frozenset({"medium"})
+        assert frozenset({"medium"}) == MEDIUM_SEVERITIES
 
     def test_verdicts_tuple_complete(self) -> None:
         assert VERDICTS == (

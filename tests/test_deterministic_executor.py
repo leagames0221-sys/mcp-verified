@@ -14,7 +14,6 @@ from mcp_verified.checks.executors.deterministic import (
     _redact_match,
 )
 
-
 # ---------- Fixture builders ----------
 
 
@@ -181,14 +180,20 @@ class TestFileWalker:
         assert result == []
 
     def test_extensions_outside_text_set_are_skipped(self, tmp_path: Path) -> None:
-        (tmp_path / "blob.bin").write_bytes(b"\x00\x01" + b"sk-EXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLE0123")
+        (tmp_path / "blob.bin").write_bytes(
+            b"\x00\x01" + b"sk-EXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLE0123"
+        )
         result = DeterministicExecutor().run(tmp_path)
         assert result == []
 
     def test_files_larger_than_max_size_are_skipped(self, tmp_path: Path) -> None:
         path = tmp_path / "huge.py"
         # Build a >1 KB file but configure the executor with max_file_size=512.
-        path.write_text(("# pad\n" * 200) + "TOKEN = 'sk-EXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLE0123'  # gitleaks:allow\n", encoding="utf-8")
+        path.write_text(
+            ("# pad\n" * 200)
+            + "TOKEN = 'sk-EXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLE0123'  # gitleaks:allow\n",
+            encoding="utf-8",
+        )
         executor = DeterministicExecutor(max_file_size=512)
         result = executor.run(tmp_path)
         assert result == []

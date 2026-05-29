@@ -33,31 +33,19 @@ def _sample_envelopes() -> list[tuple[type, str, dict[str, Any]]]:
         (
             AnthropicProvider,
             ANTHROPIC_API_KEY_ENV,
-            {
-                "content": [
-                    {"type": "text", "text": json.dumps({"findings": [{"rule_id": "X"}]})}
-                ]
-            },
+            {"content": [{"type": "text", "text": json.dumps({"findings": [{"rule_id": "X"}]})}]},
         ),
         (
             OpenAIProvider,
             OPENAI_API_KEY_ENV,
-            {
-                "choices": [
-                    {"message": {"content": json.dumps({"findings": [{"rule_id": "X"}]})}}
-                ]
-            },
+            {"choices": [{"message": {"content": json.dumps({"findings": [{"rule_id": "X"}]})}}]},
         ),
         (
             GeminiProvider,
             GEMINI_API_KEY_ENV,
             {
                 "candidates": [
-                    {
-                        "content": {
-                            "parts": [{"text": json.dumps({"findings": [{"rule_id": "X"}]})}]
-                        }
-                    }
+                    {"content": {"parts": [{"text": json.dumps({"findings": [{"rule_id": "X"}]})}]}}
                 ]
             },
         ),
@@ -205,9 +193,7 @@ class TestHappyPath:
         assert body["model"] == ANTHROPIC_DEFAULT_MODEL
         assert body["messages"][0]["content"] == "prompt"
 
-    def test_openai_request_carries_bearer_auth(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_openai_request_carries_bearer_auth(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv(PAID_OPT_IN_ENV_VAR, PAID_OPT_IN_VALUE)
         monkeypatch.setenv(OPENAI_API_KEY_ENV, "sk-fixture-key")
         envelope = {"choices": [{"message": {"content": "{}"}}]}
@@ -223,9 +209,7 @@ class TestHappyPath:
         assert body["response_format"] == {"type": "json_object"}
         assert body["temperature"] == 0.0
 
-    def test_gemini_request_carries_key_in_url(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_gemini_request_carries_key_in_url(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv(PAID_OPT_IN_ENV_VAR, PAID_OPT_IN_VALUE)
         monkeypatch.setenv(GEMINI_API_KEY_ENV, "abc-fixture-key")
         envelope = {"candidates": [{"content": {"parts": [{"text": "{}"}]}}]}

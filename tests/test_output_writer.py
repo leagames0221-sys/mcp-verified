@@ -98,8 +98,9 @@ class TestSlugify:
 
 class TestFindingFilename:
     def test_format(self) -> None:
-        assert finding_filename("high", 1, "CRED-API-KEY-OPENAI") == \
-            "high-001-cred-api-key-openai.md"
+        assert (
+            finding_filename("high", 1, "CRED-API-KEY-OPENAI") == "high-001-cred-api-key-openai.md"
+        )
 
     def test_zero_padded_sequence(self) -> None:
         assert finding_filename("medium", 12, "X") == "medium-012-x.md"
@@ -193,7 +194,10 @@ class TestAuditDirWriter:
     def test_writes_full_directory_tree(self, tmp_path: Path) -> None:
         writer = AuditDirWriter(root_dir=tmp_path)
         manifest = _manifest()
-        findings = [_finding(severity="high", rule_id="X"), _finding(severity="medium", rule_id="Y")]
+        findings = [
+            _finding(severity="high", rule_id="X"),
+            _finding(severity="medium", rule_id="Y"),
+        ]
         audit_dir = writer.write(manifest, findings)
         # Manifest
         assert (audit_dir / "audit-manifest.json").exists()
@@ -208,9 +212,7 @@ class TestAuditDirWriter:
 
     def test_target_metadata_records_latest_verdict_and_id(self, tmp_path: Path) -> None:
         writer = AuditDirWriter(root_dir=tmp_path)
-        m1 = _manifest(
-            audit_id="mcp-verified-2026-05-28-001", verdict="verified"
-        )
+        m1 = _manifest(audit_id="mcp-verified-2026-05-28-001", verdict="verified")
         writer.write(m1, [])
         m2 = _manifest(audit_id="mcp-verified-2026-05-29-001", verdict="risky")
         writer.write(m2, [_finding()])

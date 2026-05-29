@@ -13,8 +13,8 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from mcp_verified import __version__
 from mcp_verified._pipeline import (
@@ -129,12 +129,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "audit",
         help="Walk the registry, audit candidates, write the verdict tree.",
     )
-    p_audit.add_argument(
-        "--top", type=int, default=50, help="Number of top candidates to audit."
-    )
-    p_audit.add_argument(
-        "--out", type=str, required=True, help="Root output directory."
-    )
+    p_audit.add_argument("--top", type=int, default=50, help="Number of top candidates to audit.")
+    p_audit.add_argument("--out", type=str, required=True, help="Root output directory.")
     p_audit.add_argument(
         "--checks",
         type=str,
@@ -180,9 +176,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_export.add_argument(
         "--target", type=str, required=True, help="Path to the target's audit dir."
     )
-    p_export.add_argument(
-        "--output", type=str, required=True, help="Path to the .tar.gz to write."
-    )
+    p_export.add_argument("--output", type=str, required=True, help="Path to the .tar.gz to write.")
     p_export.add_argument(
         "--host", type=str, default=None, help="Override host in the tarball prefix."
     )

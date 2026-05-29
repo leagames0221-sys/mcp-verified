@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from mcp_verified.budget.per_server import (
@@ -66,16 +66,11 @@ _NAME_SAFE = re.compile(r"[^A-Za-z0-9._-]+")
 
 
 def _now_iso() -> str:
-    return (
-        datetime.now(timezone.utc)
-        .replace(microsecond=0)
-        .isoformat()
-        .replace("+00:00", "Z")
-    )
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _date_yyyy_mm_dd() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return datetime.now(UTC).strftime("%Y-%m-%d")
 
 
 def _next_sequence_for(auditor: str, date: str, target_dir: Path) -> int:
@@ -178,10 +173,7 @@ def _audit_cloned_tree(
     checks: tuple[CheckDefinition, ...],
 ) -> list[Finding]:
     deterministic = DeterministicExecutor(patterns=DEFAULT_PATTERNS).run(repo.path)
-    if checks:
-        llm = LLMAssistedExecutor(provider=provider).run(repo.path, list(checks))
-    else:
-        llm = []
+    llm = LLMAssistedExecutor(provider=provider).run(repo.path, list(checks)) if checks else []
     findings = list(deterministic) + list(llm)
     findings.sort(key=lambda f: (f.file_path, f.line_number, f.rule_id))
     return findings
@@ -233,7 +225,7 @@ def audit_one(
     function does not mutate anything outside the configured `out_dir`.
     """
     started_at = _now_iso()
-    start_clock = datetime.now(timezone.utc)
+    start_clock = datetime.now(UTC)
 
     # 1. Non-GitHub or no repo URL: unknown without ever cloning.
     if not entry.is_github_source or not entry.repository_url:
@@ -242,9 +234,7 @@ def audit_one(
         # verdict registry still records the candidate.
         target_dir_url = entry.repository_url or f"unknown://{entry.name}"
         date = _date_yyyy_mm_dd()
-        target_for_seq = config.out_dir / "audits" / "unknown" / entry.name.replace(
-            "/", "_"
-        )
+        target_for_seq = config.out_dir / "audits" / "unknown" / entry.name.replace("/", "_")
         sequence = _next_sequence_for(config.auditor_name, date, target_for_seq)
         audit_id = build_audit_id(config.auditor_name, date, sequence)
         manifest = AuditManifest(
@@ -273,9 +263,7 @@ def audit_one(
         try:
             audit_dir = writer.write(manifest, [])
         except ValueError:
-            audit_dir = _write_unknown_outcome(
-                config.out_dir, manifest, [], bucket="_unknown"
-            )
+            audit_dir = _write_unknown_outcome(config.out_dir, manifest, [], bucket="_unknown")
         return CandidateOutcome(
             entry=entry,
             verdict=VERDICT_UNKNOWN,
@@ -291,9 +279,7 @@ def audit_one(
     def _work() -> tuple[ClonedRepo, list[Finding]]:
         repo = safe_clone(repo_url)
         try:
-            findings = _audit_cloned_tree(
-                repo, provider=config.provider, checks=config.checks
-            )
+            findings = _audit_cloned_tree(repo, provider=config.provider, checks=config.checks)
         except ProviderError as exc:
             repo.cleanup()
             raise exc
@@ -307,9 +293,7 @@ def audit_one(
         finished_at = _now_iso()
         # Build an unknown-verdict manifest under a target-named directory.
         date = _date_yyyy_mm_dd()
-        synthetic_target = config.out_dir / "audits" / "unknown" / entry.name.replace(
-            "/", "_"
-        )
+        synthetic_target = config.out_dir / "audits" / "unknown" / entry.name.replace("/", "_")
         sequence = _next_sequence_for(config.auditor_name, date, synthetic_target)
         audit_id = build_audit_id(config.auditor_name, date, sequence)
         manifest = AuditManifest(
@@ -334,9 +318,7 @@ def audit_one(
         try:
             audit_dir = writer.write(manifest, [])
         except ValueError:
-            audit_dir = _write_unknown_outcome(
-                config.out_dir, manifest, [], bucket="_unknown"
-            )
+            audit_dir = _write_unknown_outcome(config.out_dir, manifest, [], bucket="_unknown")
         return CandidateOutcome(
             entry=entry,
             verdict=VERDICT_UNKNOWN,
@@ -350,9 +332,7 @@ def audit_one(
         finished_at = _now_iso()
         date = _date_yyyy_mm_dd()
         # We don't have a commit hash; place under the repo URL as best we can.
-        synthetic_target = config.out_dir / "audits" / "_pending" / entry.name.replace(
-            "/", "_"
-        )
+        synthetic_target = config.out_dir / "audits" / "_pending" / entry.name.replace("/", "_")
         sequence = _next_sequence_for(config.auditor_name, date, synthetic_target)
         audit_id = build_audit_id(config.auditor_name, date, sequence)
         manifest = AuditManifest(
@@ -395,9 +375,8 @@ def audit_one(
     try:
         verdict = aggregate_verdict(findings, audit_completed=True)
         finished_at = _now_iso()
-        elapsed = (datetime.now(timezone.utc) - start_clock).total_seconds()
+        elapsed = (datetime.now(UTC) - start_clock).total_seconds()
         date = _date_yyyy_mm_dd()
-        target_dir = config.out_dir / "audits" / "github.com"
         sequence_dir = config.out_dir
         # build a probe target for sequence numbering
         host, owner, repo_name = (

@@ -149,6 +149,4 @@ class _PaidProviderBase(Provider):
         try:
             return self._extract_content(envelope)
         except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
-            raise ProviderResponseError(
-                f"{self.name} content extraction failed: {exc}"
-            ) from exc
+            raise ProviderResponseError(f"{self.name} content extraction failed: {exc}") from exc

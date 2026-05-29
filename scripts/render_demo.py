@@ -12,6 +12,7 @@ Usage:
 Dependencies: Pillow only (a docs/dev tool; not a runtime dependency of the
 package, which ships zero runtime PyPI deps).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -94,8 +95,12 @@ def main() -> None:
         d.ellipse([20 + i * 26, cy - 8, 36 + i * 26, cy + 8], fill=col)
     title = "mcp-verified  -  quickstart (provider=mock, no network)"
     tb = d.textbbox((0, 0), title, font=bar_font)
-    d.text(((width - (tb[2] - tb[0])) / 2, cy - (tb[3] - tb[1]) / 2 - 2),
-           title, font=bar_font, fill=DIM)
+    d.text(
+        ((width - (tb[2] - tb[0])) / 2, cy - (tb[3] - tb[1]) / 2 - 2),
+        title,
+        font=bar_font,
+        fill=DIM,
+    )
 
     y = bar_h + pad
     for kind, text in SESSION:

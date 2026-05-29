@@ -57,9 +57,7 @@ class TestDetectDivergence:
     def test_explicit_verdicts_override_manifest(self) -> None:
         prior = _manifest(verdict="verified")
         current = _manifest(verdict="verified")
-        report = detect_divergence(
-            prior, current, prior_verdict="caution", current_verdict="risky"
-        )
+        report = detect_divergence(prior, current, prior_verdict="caution", current_verdict="risky")
         assert report is not None
         assert report.prior_verdict == "caution"
         assert report.current_verdict == "risky"
@@ -118,9 +116,7 @@ class TestFindLatestPriorAudit:
     def test_excludes_current_audit_id(self, tmp_path: Path) -> None:
         (tmp_path / "audits" / "auditor-2026-05-28-001").mkdir(parents=True)
         (tmp_path / "audits" / "auditor-2026-05-29-001").mkdir(parents=True)
-        result = find_latest_prior_audit(
-            tmp_path, current_audit_id="auditor-2026-05-29-001"
-        )
+        result = find_latest_prior_audit(tmp_path, current_audit_id="auditor-2026-05-29-001")
         assert result is not None
         assert result.name == "auditor-2026-05-28-001"
 

@@ -27,9 +27,9 @@ import shutil
 import stat
 import subprocess
 import tempfile
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 from urllib.parse import urlparse
 
 GITHUB_HOST = "github.com"
@@ -116,7 +116,7 @@ class ClonedRepo:
     def cleanup(self) -> None:
         _rmtree_force(self.path)
 
-    def __enter__(self) -> "ClonedRepo":
+    def __enter__(self) -> ClonedRepo:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:

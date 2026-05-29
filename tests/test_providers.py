@@ -11,9 +11,9 @@ import pytest
 
 from mcp_verified.providers import (
     EMPTY_FINDINGS,
-    MockProvider,
     OLLAMA_DEFAULT_BASE_URL,
     OLLAMA_DEFAULT_MODEL,
+    MockProvider,
     OllamaProvider,
     Provider,
     ProviderError,
@@ -21,7 +21,6 @@ from mcp_verified.providers import (
     ProviderUnreachableError,
     query_with_fallback,
 )
-
 
 # ---------- Mock provider ----------
 
@@ -155,9 +154,7 @@ class TestOllamaProviderHappyPath:
 class TestOllamaProviderErrorPaths:
     def test_unreachable_raises_provider_unreachable(self) -> None:
         # Port 1 is not bound; expect URLError -> ProviderUnreachableError.
-        provider = OllamaProvider(
-            base_url="http://127.0.0.1:1", timeout_seconds=2.0
-        )
+        provider = OllamaProvider(base_url="http://127.0.0.1:1", timeout_seconds=2.0)
         with pytest.raises(ProviderUnreachableError):
             provider.query("ping", {})
 
@@ -222,9 +219,7 @@ class TestQueryWithFallback:
             def query(self, prompt: str, schema: dict[str, Any]) -> dict[str, Any]:
                 raise ProviderUnreachableError("simulated")
 
-        result, name = query_with_fallback(
-            _BrokenProvider(), MockProvider(), "p", {}
-        )
+        result, name = query_with_fallback(_BrokenProvider(), MockProvider(), "p", {})
         assert name == "mock"
         assert result == EMPTY_FINDINGS
 

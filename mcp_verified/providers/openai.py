@@ -62,7 +62,5 @@ class OpenAIProvider(_PaidProviderBase):
         content = message["content"]
         parsed = json.loads(content)
         if not isinstance(parsed, dict):
-            raise TypeError(
-                f"OpenAI parsed content is not an object: {type(parsed).__name__}"
-            )
+            raise TypeError(f"OpenAI parsed content is not an object: {type(parsed).__name__}")
         return parsed

@@ -46,9 +46,7 @@ def render_assessment_md(manifest: AuditManifest, findings: list[Finding]) -> st
             lines.append(f"| {severity} | {summary[severity]} |")
     if not findings:
         lines.append("")
-        lines.append(
-            "No findings were recorded against this target by the Phase 1 check set."
-        )
+        lines.append("No findings were recorded against this target by the Phase 1 check set.")
     else:
         lines.append("")
         lines.append("## Findings")
@@ -66,12 +64,8 @@ def render_assessment_md(manifest: AuditManifest, findings: list[Finding]) -> st
         )
         for f in sorted_findings:
             cwe = f"CWE-{f.cwe}" if f.cwe is not None else "(none)"
-            location = (
-                f"`{f.file_path}:{f.line_number}`" if f.file_path else "(none)"
-            )
-            lines.append(
-                f"| `{f.rule_id}` | {f.severity} | {location} | {cwe} |"
-            )
+            location = f"`{f.file_path}:{f.line_number}`" if f.file_path else "(none)"
+            lines.append(f"| `{f.rule_id}` | {f.severity} | {location} | {cwe} |")
     lines.append("")
     lines.append("## Tools used")
     lines.append("")
@@ -89,9 +83,7 @@ def render_assessment_md(manifest: AuditManifest, findings: list[Finding]) -> st
     return "\n".join(lines) + "\n"
 
 
-def write_assessment_md(
-    manifest: AuditManifest, findings: list[Finding], path: Path
-) -> Path:
+def write_assessment_md(manifest: AuditManifest, findings: list[Finding], path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(render_assessment_md(manifest, findings), encoding="utf-8")
     return path

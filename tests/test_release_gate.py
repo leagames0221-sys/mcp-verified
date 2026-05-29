@@ -23,10 +23,29 @@ def _posix(path: Path | str) -> str:
 
 
 def _has_bash() -> bool:
-    """True if a bash interpreter is reachable on PATH."""
+    """True if a *working* POSIX bash is reachable on PATH.
+
+    On GitHub's windows-latest runner, ``bash`` resolves to the WSL stub
+    (``C:\\Windows\\System32\\bash.exe``), which has no distribution installed
+    and only prints an install prompt. Probing with a trivial command makes
+    the stub count as "no bash", so these tests skip there while still running
+    on Linux, macOS, and Git Bash. release_gate.sh itself is verified on the
+    Linux CI job.
+    """
     from shutil import which
 
-    return which("bash") is not None
+    if which("bash") is None:
+        return False
+    try:
+        proc = subprocess.run(
+            ["bash", "-c", "echo __bash_ok__"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return "__bash_ok__" in proc.stdout
 
 
 pytestmark = pytest.mark.skipif(
@@ -42,8 +61,13 @@ def _git(args: list[str], *, cwd: Path) -> subprocess.CompletedProcess:
         capture_output=True,
         text=True,
         check=True,
-        env={**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
-             "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"},
+        env={
+            **os.environ,
+            "GIT_AUTHOR_NAME": "t",
+            "GIT_AUTHOR_EMAIL": "t@t",
+            "GIT_COMMITTER_NAME": "t",
+            "GIT_COMMITTER_EMAIL": "t@t",
+        },
     )
 
 
@@ -80,9 +104,7 @@ def _run_gate(
         args.extend(["--internal-wordlist", _posix(internal_wordlist)])
     if extra:
         args.extend(extra)
-    return subprocess.run(
-        args, capture_output=True, text=True, check=False, cwd=REPO_ROOT
-    )
+    return subprocess.run(args, capture_output=True, text=True, check=False, cwd=REPO_ROOT)
 
 
 class TestNegativePath:

@@ -22,9 +22,9 @@ and recording the bump in audit-manifest.json `audit_metadata.tools_used`.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Iterable
+from datetime import UTC, datetime
 
 from mcp_verified.registry.client import RegistryEntry
 
@@ -63,8 +63,8 @@ def _days_since(timestamp: str, *, now: datetime | None = None) -> float | None:
     if parsed is None:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    reference = now if now is not None else datetime.now(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
+    reference = now if now is not None else datetime.now(UTC)
     delta = reference - parsed
     days = delta.total_seconds() / 86400.0
     return max(days, 0.0)
@@ -126,7 +126,9 @@ class CandidateScorer:
             if (not self.require_latest or e.is_latest) and e.status == self.active_status
         ]
         scored = [
-            ScoredCandidate(entry=e, score=score_entry(e, now=now), formula_revision=self.formula_revision)
+            ScoredCandidate(
+                entry=e, score=score_entry(e, now=now), formula_revision=self.formula_revision
+            )
             for e in filtered
         ]
         # Sort: higher score first; lex on name for tiebreak (deterministic).

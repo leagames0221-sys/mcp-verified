@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from mcp_verified.checks.frontmatter import (
@@ -92,13 +94,7 @@ class TestListValues:
 
 class TestStructureRejection:
     def test_rejects_block_list(self) -> None:
-        text = (
-            "---\n"
-            "cwe:\n"
-            "  - 798\n"
-            "  - 200\n"
-            "---\n"
-        )
+        text = "---\ncwe:\n  - 798\n  - 200\n---\n"
         with pytest.raises(FrontmatterParseError):
             parse_frontmatter(text)
 
@@ -117,13 +113,7 @@ class TestStructureRejection:
 
 class TestBodyExtraction:
     def test_body_preserved_with_internal_dashes(self) -> None:
-        text = (
-            "---\n"
-            "title: x\n"
-            "---\n"
-            "## Section\n"
-            "Body with --- internal triple-dash.\n"
-        )
+        text = "---\ntitle: x\n---\n## Section\nBody with --- internal triple-dash.\n"
         result = parse_frontmatter(text)
         assert result.body == "## Section\nBody with --- internal triple-dash."
 
@@ -141,5 +131,5 @@ class TestBodyExtraction:
 def test_result_is_frozen_dataclass() -> None:
     result = parse_frontmatter("---\ntitle: x\n---\n")
     assert isinstance(result, Frontmatter)
-    with pytest.raises(Exception):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         result.fields = {}  # type: ignore[misc]

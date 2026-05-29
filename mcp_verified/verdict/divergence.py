@@ -78,19 +78,21 @@ def detect_divergence(
     or read from the manifests at `audit_metadata.verdict` (the storage
     path).
     """
-    p_verdict = prior_verdict if prior_verdict is not None else _get(
-        prior_manifest, "audit_metadata", "verdict", default="(unknown)"
+    p_verdict = (
+        prior_verdict
+        if prior_verdict is not None
+        else _get(prior_manifest, "audit_metadata", "verdict", default="(unknown)")
     )
-    c_verdict = current_verdict if current_verdict is not None else _get(
-        current_manifest, "audit_metadata", "verdict", default="(unknown)"
+    c_verdict = (
+        current_verdict
+        if current_verdict is not None
+        else _get(current_manifest, "audit_metadata", "verdict", default="(unknown)")
     )
     if p_verdict == c_verdict:
         return None
 
     return DivergenceReport(
-        target_repo_url=str(
-            _get(current_manifest, "target", "repo_url", default="(unknown)")
-        ),
+        target_repo_url=str(_get(current_manifest, "target", "repo_url", default="(unknown)")),
         target_commit_hash=str(
             _get(current_manifest, "target", "commit_hash", default="(unknown)")
         ),
@@ -137,9 +139,7 @@ def render_discrepancy_md(report: DivergenceReport) -> str:
         f"| Audit id | `{report.prior_audit_id}` | `{report.current_audit_id}` |",
         f"| Verdict | **{report.prior_verdict}** | **{report.current_verdict}** |",
     ]
-    severities = sorted(
-        set(report.prior_findings_summary) | set(report.current_findings_summary)
-    )
+    severities = sorted(set(report.prior_findings_summary) | set(report.current_findings_summary))
     for sev in severities:
         prior = report.prior_findings_summary.get(sev, 0)
         current = report.current_findings_summary.get(sev, 0)

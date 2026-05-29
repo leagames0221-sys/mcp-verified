@@ -26,7 +26,7 @@ write.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -93,9 +93,7 @@ class AuditDirWriter:
         self._update_target_metadata(target_dir, manifest)
         return audit_dir
 
-    def _update_target_metadata(
-        self, target_dir: Path, manifest: AuditManifest
-    ) -> Path:
+    def _update_target_metadata(self, target_dir: Path, manifest: AuditManifest) -> Path:
         target_dir.mkdir(parents=True, exist_ok=True)
         meta_path = target_dir / TARGET_METADATA_FILENAME
         existing = self._load_existing_metadata(meta_path)

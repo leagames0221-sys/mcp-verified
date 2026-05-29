@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import os
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -19,7 +17,6 @@ from mcp_verified.clone.safe_clone import (
     safe_clone,
 )
 from mcp_verified.registry.client import integration_tests_enabled
-
 
 # ---------- URL gate ----------
 
@@ -126,7 +123,18 @@ class TestSafeCloneSubprocessContract:
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     ) -> None:
         """AC-5.4: safe_clone must never invoke npm, pip, node, python, etc."""
-        forbidden = {"npm", "pnpm", "yarn", "pip", "pipx", "node", "python", "python3", "sh", "bash"}
+        forbidden = {
+            "npm",
+            "pnpm",
+            "yarn",
+            "pip",
+            "pipx",
+            "node",
+            "python",
+            "python3",
+            "sh",
+            "bash",
+        }
         fake_run, calls, _ = _fake_clone_run_factory(lambda p: (p / "README").write_text("ok"))
         monkeypatch.setattr(subprocess, "run", fake_run)
 
@@ -149,9 +157,7 @@ class TestSafeCloneSubprocessContract:
         fake_run, calls, _ = _fake_clone_run_factory(lambda p: None)
         monkeypatch.setattr(subprocess, "run", fake_run)
 
-        with safe_clone(
-            "https://github.com/octocat/Hello-World", scratch_root=tmp_path
-        ) as _repo:
+        with safe_clone("https://github.com/octocat/Hello-World", scratch_root=tmp_path) as _repo:
             pass
 
         clone_call = next(c for c in calls if "clone" in c)
@@ -177,9 +183,7 @@ class TestSafeCloneFailureModes:
 
         monkeypatch.setattr(subprocess, "run", fake_run)
         with pytest.raises(CloneFailedError):
-            safe_clone(
-                "https://github.com/octocat/does-not-exist", scratch_root=tmp_path
-            )
+            safe_clone("https://github.com/octocat/does-not-exist", scratch_root=tmp_path)
         assert "scratch" in captured
         assert not captured["scratch"].exists(), "scratch directory must be cleaned up on failure"
 
@@ -212,9 +216,7 @@ class TestClonedRepoLifecycle:
         scratch = tmp_path / "synthetic-clone"
         scratch.mkdir()
         (scratch / "README").write_text("x")
-        repo = ClonedRepo(
-            path=scratch, url="https://github.com/x/y", commit_hash="0" * 40
-        )
+        repo = ClonedRepo(path=scratch, url="https://github.com/x/y", commit_hash="0" * 40)
         with repo:
             assert scratch.exists()
         assert not scratch.exists()
@@ -223,20 +225,15 @@ class TestClonedRepoLifecycle:
         scratch = tmp_path / "synthetic-clone"
         scratch.mkdir()
         (scratch / "README").write_text("x")
-        repo = ClonedRepo(
-            path=scratch, url="https://github.com/x/y", commit_hash="0" * 40
-        )
-        with pytest.raises(RuntimeError):
-            with repo:
-                raise RuntimeError("boom")
+        repo = ClonedRepo(path=scratch, url="https://github.com/x/y", commit_hash="0" * 40)
+        with pytest.raises(RuntimeError), repo:
+            raise RuntimeError("boom")
         assert not scratch.exists()
 
     def test_explicit_cleanup_is_idempotent(self, tmp_path: Path) -> None:
         scratch = tmp_path / "synthetic-clone"
         scratch.mkdir()
-        repo = ClonedRepo(
-            path=scratch, url="https://github.com/x/y", commit_hash="0" * 40
-        )
+        repo = ClonedRepo(path=scratch, url="https://github.com/x/y", commit_hash="0" * 40)
         repo.cleanup()
         assert not scratch.exists()
         # Second cleanup is a no-op, not an error.

@@ -37,9 +37,7 @@ def _infer_host_owner_repo(target_dir: Path) -> tuple[str, str, str]:
     """Pull the last three path components off the resolved target dir."""
     parts = target_dir.resolve().parts
     if len(parts) < 3:
-        raise ExportError(
-            f"cannot infer host/owner/repo from target_dir: {target_dir}"
-        )
+        raise ExportError(f"cannot infer host/owner/repo from target_dir: {target_dir}")
     return parts[-3], parts[-2], parts[-1]
 
 
@@ -127,6 +125,7 @@ def export_audit_db_target(
                 data = path.read_bytes()
                 info.size = len(data)
                 import io
+
                 tar.addfile(info, fileobj=io.BytesIO(data))
             else:
                 # Symlinks / sockets / fifos are out of scope for Phase 1.

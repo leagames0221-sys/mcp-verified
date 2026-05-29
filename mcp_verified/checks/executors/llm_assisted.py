@@ -163,7 +163,11 @@ def _coerce_finding(check: CheckDefinition, raw: dict[str, Any]) -> Finding | No
         cwe = int(cwe_raw) if isinstance(cwe_raw, int) and not isinstance(cwe_raw, bool) else None
         file_path = str(raw.get("file_path") or "")
         line_number_raw = raw.get("line_number")
-        line_number = int(line_number_raw) if isinstance(line_number_raw, int) and not isinstance(line_number_raw, bool) else 0
+        line_number = (
+            int(line_number_raw)
+            if isinstance(line_number_raw, int) and not isinstance(line_number_raw, bool)
+            else 0
+        )
         snippet = str(raw.get("snippet") or "")
         description = str(raw.get("description") or check.title)
     except (TypeError, ValueError):
@@ -228,9 +232,7 @@ class LLMAssistedExecutor:
             raise NotADirectoryError(f"repo_root is not a directory: {repo_root}")
         # Filter to LLM-required checks first; if no candidates, skip the
         # file walk entirely (the LLM is not going to be called).
-        eligible = [
-            c for c in checks if c.raw_frontmatter.get("requires_llm") is True
-        ]
+        eligible = [c for c in checks if c.raw_frontmatter.get("requires_llm") is True]
         if not eligible:
             return []
         excerpts = self._collect_excerpts(repo_root)
@@ -245,9 +247,7 @@ class LLMAssistedExecutor:
                 continue
             raw_findings = response.get("findings") or []
             if not isinstance(raw_findings, list):
-                all_findings.append(
-                    _error_finding(check, "response.findings is not a list")
-                )
+                all_findings.append(_error_finding(check, "response.findings is not a list"))
                 continue
             for raw in raw_findings:
                 if not isinstance(raw, dict):

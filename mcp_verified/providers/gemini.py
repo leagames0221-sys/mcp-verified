@@ -61,7 +61,5 @@ class GeminiProvider(_PaidProviderBase):
         text = parts[0]["text"]
         parsed = json.loads(text)
         if not isinstance(parsed, dict):
-            raise TypeError(
-                f"Gemini parsed content is not an object: {type(parsed).__name__}"
-            )
+            raise TypeError(f"Gemini parsed content is not an object: {type(parsed).__name__}")
         return parsed

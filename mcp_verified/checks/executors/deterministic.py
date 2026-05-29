@@ -26,9 +26,9 @@ CWE-95 (code injection), and CWE-798 (use of hard-coded credentials).
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Iterator, Sequence
 
 DEFAULT_MAX_FILE_SIZE = 1 * 1024 * 1024  # 1 MB; larger files are likely data, not source.
 

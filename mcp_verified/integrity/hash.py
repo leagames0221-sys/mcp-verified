@@ -26,8 +26,9 @@ when it diffs two manifests.
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from mcp_verified.checks.loader import CheckDefinition
 

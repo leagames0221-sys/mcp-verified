@@ -122,9 +122,7 @@ class TestRequiresLlmFilter:
         prompt = provider.calls[0][0]
         assert "Synthetic LLM check" in prompt
 
-    def test_no_eligible_checks_means_no_provider_call(
-        self, small_repo: Path
-    ) -> None:
+    def test_no_eligible_checks_means_no_provider_call(self, small_repo: Path) -> None:
         provider = _RecordingProvider({"findings": [{"rule_id": "X"}]})
         executor = LLMAssistedExecutor(provider=provider)
         checks = [_make_check(requires_llm=False)]
@@ -188,9 +186,7 @@ class TestResponseParsing:
         rule_ids = [f.rule_id for f in result]
         assert rule_ids == ["OK"]
 
-    def test_findings_field_not_a_list_emits_error_finding(
-        self, small_repo: Path
-    ) -> None:
+    def test_findings_field_not_a_list_emits_error_finding(self, small_repo: Path) -> None:
         response: dict[str, Any] = {"findings": "not a list"}
         executor = LLMAssistedExecutor(provider=_RecordingProvider(response))
         result = executor.run(small_repo, [_make_check()])
@@ -209,12 +205,8 @@ class TestResponseParsing:
 
 
 class TestErrorHandling:
-    def test_provider_response_error_yields_one_error_finding(
-        self, small_repo: Path
-    ) -> None:
-        executor = LLMAssistedExecutor(
-            provider=_RaisingProvider(ProviderResponseError("garbage"))
-        )
+    def test_provider_response_error_yields_one_error_finding(self, small_repo: Path) -> None:
+        executor = LLMAssistedExecutor(provider=_RaisingProvider(ProviderResponseError("garbage")))
         result = executor.run(small_repo, [_make_check("c1"), _make_check("c2")])
         # Two checks, each one fails individually -> two error findings.
         assert len(result) == 2
@@ -225,9 +217,7 @@ class TestErrorHandling:
     def test_provider_unreachable_propagates(self, small_repo: Path) -> None:
         """T-09 deliberately does not catch Unreachable; callers wrap with
         query_with_fallback if they want a swap to mock."""
-        executor = LLMAssistedExecutor(
-            provider=_RaisingProvider(ProviderUnreachableError("down"))
-        )
+        executor = LLMAssistedExecutor(provider=_RaisingProvider(ProviderUnreachableError("down")))
         with pytest.raises(ProviderUnreachableError):
             executor.run(small_repo, [_make_check()])
 
@@ -242,10 +232,12 @@ class TestErrorHandling:
 
 class TestPromptConstruction:
     def test_prompt_includes_ai_instructions(self) -> None:
-        check = _make_check(
-            ai_instructions="Look for hardcoded tokens and report them."
+        check = _make_check(ai_instructions="Look for hardcoded tokens and report them.")
+        prompt = _build_prompt(
+            check,
+            excerpts=[("src/a.py", "def x(): pass")],
+            ai_section_titles=("For AI Assistants: Automated Analysis",),
         )
-        prompt = _build_prompt(check, excerpts=[("src/a.py", "def x(): pass")], ai_section_titles=("For AI Assistants: Automated Analysis",))
         assert "Look for hardcoded tokens" in prompt
         assert "src/a.py" in prompt
         assert "def x(): pass" in prompt

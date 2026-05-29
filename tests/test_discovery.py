@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -19,7 +19,7 @@ from mcp_verified.discovery.candidates import (
 from mcp_verified.registry.client import RegistryEntry, parse_response
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "registry-snapshot-2026-05-28.json"
-PINNED_NOW = datetime(2026, 5, 29, 0, 0, 0, tzinfo=timezone.utc)
+PINNED_NOW = datetime(2026, 5, 29, 0, 0, 0, tzinfo=UTC)
 
 
 @pytest.fixture
@@ -196,7 +196,8 @@ def test_top_candidates_convenience() -> None:
 
 
 def test_scores_real_registry_fixture(registry_entries: list[RegistryEntry]) -> None:
-    """The 2026-05-28 fixture should produce a non-empty, deterministically-sorted candidate list."""
+    """The 2026-05-28 fixture should produce a non-empty, deterministically
+    sorted candidate list."""
     result = top_candidates(registry_entries, n=10, now=PINNED_NOW)
     # Fixture has 3 entries total: ac.inference.sh/mcp v1.0.0 (isLatest=False),
     # ac.inference.sh/mcp v1.0.1 (isLatest=True), ac.tandem/docs-mcp v0.3.0 (isLatest=False).

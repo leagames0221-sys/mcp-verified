@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import io
 import tarfile
 from pathlib import Path
 
@@ -85,9 +84,7 @@ class TestExportHappyPath:
         assert (expected_audit_dir / "security-assessment.md").exists()
         assert (expected_audit_dir / "findings").is_dir()
         # Target-level metadata.json was also captured.
-        target_meta = (
-            extract_dir / "audits" / "github.com" / "owner" / "repo" / "metadata.json"
-        )
+        target_meta = extract_dir / "audits" / "github.com" / "owner" / "repo" / "metadata.json"
         assert target_meta.exists()
 
     def test_returns_output_path(self, tmp_path: Path) -> None:
@@ -105,10 +102,7 @@ def _tar_member_table(path: Path) -> list[tuple[str, int, int, int, int, int]]:
     tarball at `path`. Used for byte-level structural equality assertions
     that ignore the gzip header's filesystem timestamp."""
     with tarfile.open(path, mode="r:gz") as tar:
-        rows = [
-            (m.name, m.size, m.mtime, m.mode, m.uid, m.gid)
-            for m in tar.getmembers()
-        ]
+        rows = [(m.name, m.size, m.mtime, m.mode, m.uid, m.gid) for m in tar.getmembers()]
     return sorted(rows)
 
 
