@@ -1,0 +1,9 @@
+# Normalize line endings on commit; default to auto so each blob is stored LF.
+* text=auto
+
+# Shell scripts must stay LF on checkout so they run after a Windows clone
+# (CRLF makes bash fail with: $'\r': command not found).
+*.sh text eol=lf
+
+# Python sources are LF for cross-platform consistency.
+*.py text eol=lf
