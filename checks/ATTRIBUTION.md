@@ -41,7 +41,7 @@ the audit set.
 ## Files added in this fork (not from upstream)
 
 These checks are MCP-specific extensions modeled on the attack
-taxonomy in Wang et al., "A First Look at the Security Issues in the
+taxonomy in Li and Gao, "A First Look at the Security Issues in the
 Model Context Protocol Ecosystem" (arXiv:2510.16558, accepted to
 DSN 2026). They follow the upstream's five-section structure but are
 original content:

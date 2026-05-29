@@ -6,7 +6,7 @@ Accepted, 2026-05-28.
 
 ## Context
 
-The MCP ecosystem has multiple registries as of 2026-05. Wang et al. (arXiv:2510.16558, accepted to DSN 2026) catalogued 67,057 servers across six registries:
+The MCP ecosystem has multiple registries as of 2026-05. Li and Gao (arXiv:2510.16558, accepted to DSN 2026) catalogued 67,057 servers across six registries:
 
 - Centralized: `registry.modelcontextprotocol.io` (official, ~518+ entries in Feb 2026), Smithery, npm.
 - Decentralized: `mcp.so`, MCP Market, MCP Store, Pulse MCP.

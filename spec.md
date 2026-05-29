@@ -164,4 +164,4 @@ Phase 1 scope excludes: live network probing of MCP servers, runtime exploit ver
 - `SECURITY.md` — hardening posture, reporting channel.
 - `docs/adr/` — architecture decision records.
 - Upstream: [`mcpserver-audit`](https://github.com/ModelContextProtocol-Security/mcpserver-audit), [`audit-db`](https://github.com/ModelContextProtocol-Security/audit-db).
-- Threat model source: Wang et al., "A First Look at the Security Issues in the Model Context Protocol Ecosystem" (arXiv:2510.16558).
+- Threat model source: Li and Gao, "A First Look at the Security Issues in the Model Context Protocol Ecosystem" (arXiv:2510.16558).

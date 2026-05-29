@@ -8,8 +8,8 @@ Accepted, 2026-05-29.
 
 Phase 1 ships a check seed forked from `mcpserver-audit` (ADR-007) plus
 three MCP-specific extensions (`mcp-transport-security`,
-`tool-poisoning-detection`, `redirect-hijacking`) modelled on the Wang
-et al. arXiv paper. As Phase 1 closed, the deep-research probe of
+`tool-poisoning-detection`, `redirect-hijacking`) modelled on the Li
+and Gao arXiv paper. As Phase 1 closed, the deep-research probe of
 2026-05-29 (evidence file `docs/evidence/2026-05-29-deep-research-mcp-threat-surface.md`)
 surfaced two upstream taxonomies that this project's check set should
 acknowledge structurally rather than ad-hoc:

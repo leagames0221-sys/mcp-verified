@@ -67,7 +67,7 @@ Recorded CLI captures and a sample verdict registry tree live under
 - Vulnerability check templates adapted from [`mcpserver-audit`](https://github.com/ModelContextProtocol-Security/mcpserver-audit), a Cloud Security Alliance community project (Apache 2.0).
 - Output schema follows [`audit-db`](https://github.com/ModelContextProtocol-Security/audit-db) (Apache 2.0).
 - Scoring backbone aligns with the AIVSS (AI Vulnerability Scoring System) framework published by the CSA MCP Security Project.
-- Threat model informed by Wang et al., "A First Look at the Security Issues in the Model Context Protocol Ecosystem" (arXiv:2510.16558, accepted to DSN 2026).
+- Threat model informed by Li and Gao, "A First Look at the Security Issues in the Model Context Protocol Ecosystem" (arXiv:2510.16558, accepted to DSN 2026).
 
 ## License
 
