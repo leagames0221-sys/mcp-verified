@@ -14,15 +14,21 @@ Snapshot recorded when the repository visibility was changed to public.
 - LICENSE: MIT. README carries overview, demo image, four-constraint
   design narrative, quickstart, and an explicit Limitations section.
 
-## Known open item — CI billing
+## CI status — green after the public flip
 
-GitHub Actions runs are currently not starting. The run annotations report
-an account-level billing block:
+While the repository was private, Actions runs were blocked under the
+free-tier billing rule (jobs not starting). The public flip restored free
+standard-runner minutes, and the first post-flip runs surfaced two real,
+previously-masked issues that were then fixed:
 
-> "The job was not started because recent account payments have failed or
-> your spending limit needs to be increased."
+- **Lint debt** — the tree had 36 ruff findings against its own
+  `[tool.ruff]` config (the lint job had never actually run). Fixed with
+  `ruff --fix` + manual fixes + `ruff format` across the tree.
+- **windows-latest test failures** — `bash scripts/release_gate.sh`
+  resolved to the WSL stub on the runner. `_has_bash()` now probes that
+  bash actually executes, so those tests skip there while still running on
+  Linux, macOS, and Git Bash.
 
-Public repositories receive free standard-runner minutes, so **no workflow
-change is required** — once the account billing is resolved, the configured
-`ci`, `gitleaks`, and `secrets-scan` workflows will execute. The full suite
-passes locally (284 tests; coverage gate ≥ 80%; release gate 8/8).
+After these fixes, `ci`, `gitleaks`, and `secrets-scan` are all green on
+`main`. The full suite passes (284 tests; coverage gate ≥ 80%; release
+gate 8/8).
