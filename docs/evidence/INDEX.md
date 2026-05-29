@@ -4,7 +4,11 @@ Primary-source fetches and verification trails are persisted here so that future
 
 | # | Date | Topic | File |
 |---|---|---|---|
-| _none yet_ | | Phase 1 fetches will land here as `<YYYY-MM-DD>-<topic>.md`. | |
+| 1 | 2026-05-28 | Official MCP registry API discovery | [`2026-05-28-registry-api-discovery.md`](2026-05-28-registry-api-discovery.md) |
+| 2 | 2026-05-29 | Registry has no popularity signal (probe) | [`2026-05-29-registry-no-popularity-signal-probe.md`](2026-05-29-registry-no-popularity-signal-probe.md) |
+| 3 | 2026-05-29 | Dogfood probes B1/B2/B4 (Phase 1 pilot) | [`2026-05-29-dogfood-probes.md`](2026-05-29-dogfood-probes.md) |
+| 4 | 2026-05-29 | Deep-research MCP threat-surface probe | [`2026-05-29-deep-research-mcp-threat-surface.md`](2026-05-29-deep-research-mcp-threat-surface.md) |
+| 5 | 2026-05-29 | Citation verification (arXiv:2510.16558, earezki, Equixly) | [`2026-05-29-citation-verification.md`](2026-05-29-citation-verification.md) |
 
 ## Conventions
 
