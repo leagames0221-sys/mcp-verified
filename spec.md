@@ -83,6 +83,65 @@ Phase 1 scope excludes: live network probing of MCP servers, runtime exploit ver
 - **AC-7.2 (Unwanted behavior)** — If any item in AC-7.1 fails, the release gate shall print the failing item, exit non-zero, and refuse to invoke `gh repo edit --visibility public`.
 - **AC-7.3 (Event-driven)** — When the release gate passes, the operator shall manually inspect the verdict registry's first ten entries before invoking the visibility change, and shall record the inspection result in `docs/evidence/public-release-readiness-<date>.md`.
 
+### F-008 — MCP-specific threat surface coverage
+
+> **Added 2026-05-29** as a result of the deep-research probe recorded
+> in `docs/evidence/2026-05-29-deep-research-mcp-threat-surface.md`.
+> The probe surfaced six dominant MCP failure-mode families plus one
+> meta-finding about the harness's own attack surface. F-008 codifies
+> the design-level acceptance criteria for the new and extended checks.
+
+- **AC-8.1 (Ubiquitous)** — `checks/` shall include a flag-injection
+  bypass test that verifies any stdio command allowlist also restricts
+  argument flags. Citations: Upsonic CVE-2026-30625 and Flowise
+  CVE-2026-40933 (the two documented `npx -c <cmd>` bypass cases).
+  Implementing check: `checks/command-injection-flag-bypass-check.md`.
+- **AC-8.2 (Event-driven)** — When a candidate's `package.json` declares
+  a `preinstall` or `install` script with network or shell side
+  effects, the system shall emit a `supply-chain-preinstall-risk`
+  finding. Citation: Unit42's analysis of the Shai-Hulud November 2025
+  variant, which moved execution from `postinstall` to `preinstall`.
+  Implementing check: `checks/supply-chain-preinstall-hook-check.md`.
+- **AC-8.3 (Event-driven)** — When a candidate's npm maintainer also
+  publishes other packages, the system shall emit a
+  `supply-chain-maintainer-blast-radius` informational finding whose
+  severity is tiered by sibling count (1 / 2–9 / 10–49 / 50+).
+  Citation: Shai-Hulud's `maintainer:` enumeration TTP (Unit42).
+  Implementing check: `checks/supply-chain-maintainer-blast-radius-check.md`.
+- **AC-8.4 (Ubiquitous)** — `checks/` shall include a token-lifecycle
+  policy inspection that flags TTL > session duration or absence of
+  enforced rotation. Citation: OWASP MCP Top 10 (2025) MCP01
+  "How to Detect?" criteria. Implementing check:
+  `checks/token-lifecycle-policy-check.md`.
+- **AC-8.5 (Event-driven)** — When a future dynamic-probe stage
+  observes a tool definition that changes between consecutive
+  `tools/list` responses without a version bump, the system shall
+  emit a `rug-pull-mutation-observed` finding. Phase 1 ships only
+  the static-precondition fallback (`rug-pull-precondition` finding).
+  Citation: arXiv 2506.01333 ETDI proposal and Postmark MCP
+  empirical incident (Snyk). Governing ADRs: ADR-012 (signal
+  design) and ADR-010 (sandbox doctrine for the dynamic stage).
+  Implementing check: `checks/tool-schema-mutation-rug-pull-check.md`.
+- **AC-8.6 (Unwanted behavior)** — The orchestrator itself shall never
+  invoke a candidate server's stdio command outside a disposable
+  sandbox. Any future stdio-probe stage shall require an explicit
+  `--dangerously-execute` CLI opt-in (naming chosen to match the
+  `mcp-scan` precedent so security reviewers recognise the opt-in
+  shape immediately). Default code paths shall continue to refuse
+  stdio invocation entirely. Governing ADR: ADR-010.
+- **AC-8.7 (Ubiquitous)** — MCP debug log redaction shall be a
+  first-class check. The check shall flag logging sites that emit
+  raw request payloads, headers, or tool-call arguments without an
+  applied redaction filter, and shall flag any committed log fixture
+  containing live credential shapes. Citation: OWASP MCP Top 10
+  (2025) MCP01 Scenario 2 "Log Scraping". Implementing check:
+  `checks/mcp-debug-log-redaction-check.md`.
+- **AC-8.8 (Ubiquitous)** — Every shipped check shall declare in its
+  frontmatter `aliases` block the stable MCP-protocol category slugs
+  it touches (per ADR-011). `mcp-verified` shall not claim to "cover"
+  any taxonomy category in full; per-check coverage is the only
+  honest claim. Governing ADR: ADR-011.
+
 ## 4. Non-functional requirements
 
 - **NFR-1 — Throughput**: a top-50 audit run shall complete within one weekend (~16 wall-clock hours) on a consumer laptop with 16 GB RAM (8 GB available for Ollama). To be validated as Phase 1.5 probe B1.

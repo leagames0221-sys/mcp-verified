@@ -49,8 +49,14 @@ original content:
 - `mcp-transport-security.md` — transport-layer concerns specific to MCP (stdio / streamable-http / SSE).
 - `tool-poisoning-detection.md` — adversarial tool-definition surfaces unique to the protocol.
 - `redirect-hijacking.md` — the redirect-hijacking class identified in the arXiv paper (304 servers found vulnerable across the studied registries).
+- `command-injection-flag-bypass-check.md` — direct command/subprocess injection plus the flag-injection-bypass class against command allowlists. Grounded in the 2026-05-29 deep-research probe (`docs/evidence/2026-05-29-deep-research-mcp-threat-surface.md` § F-1).
+- `supply-chain-preinstall-hook-check.md` — npm `preinstall` / `install` hook inspection, prompted by the Shai-Hulud November 2025 variant's pivot to pre-install execution. Grounded in evidence § F-2.
+- `supply-chain-maintainer-blast-radius-check.md` — maintainer-graph sibling-package enumeration as a combined-signal input. Grounded in evidence § F-2.
+- `token-lifecycle-policy-check.md` — OWASP MCP Top 10 (2025) MCP01 detection criteria for TTL / rotation policy. Grounded in evidence § F-6.
+- `tool-schema-mutation-rug-pull-check.md` — static-precondition fallback for the "rug-pull" attack class. Full dynamic-probe detection deferred per ADR-010 / ADR-012. Grounded in evidence § F-4.
+- `mcp-debug-log-redaction-check.md` — log-redaction inspection orthogonal to the upstream credential-storage check. Grounded in evidence § F-3.
 
-Each MCP-specific check file declares its own `aliases` block pointing to the arXiv paper and notes "added in this fork; not upstream" in its `## Purpose` section.
+Each MCP-specific check file declares its own `aliases` block pointing to a documented MCP-protocol category slug per ADR-011 and notes "added in this fork; not upstream" in its `## Purpose` section.
 
 ## License terms preserved
 

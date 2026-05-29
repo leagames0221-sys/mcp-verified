@@ -7,6 +7,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — design v0.2.0-design (2026-05-29, post-deep-research)
+
+Spec / ADR / check-set upgrade grounded in the
+`/deep-research` dynamic-workflow probe of 2026-05-29 (run ID
+`wf_ed2457ff-557`, 113 subagents, 5,428,885 output tokens, full
+results persisted under
+`docs/evidence/2026-05-29-deep-research-mcp-threat-surface.md`).
+
+- **Spec § F-008** — MCP-specific threat-surface coverage. Eight new
+  acceptance criteria (AC-8.1 through AC-8.8) codify the design-level
+  requirements for flag-injection bypass detection, supply-chain
+  pre-install hook detection, maintainer-graph blast-radius
+  inspection, token-lifecycle policy inspection, rug-pull static
+  precondition + dynamic-probe split, orchestrator sandbox doctrine,
+  MCP debug log redaction, and per-check MCP-protocol category
+  declarations.
+- **ADR-010** — Sandbox doctrine for any future stdio-probe stage.
+  Six binding constraints (disposable sandbox, flag-level allowlist,
+  explicit `--dangerously-execute` opt-in, per-probe budgets,
+  network-egress deny-by-default, result laundering) that any future
+  PR adding a dynamic stage must satisfy.
+- **ADR-011** — MCP-protocol threat taxonomy adoption stance.
+  `mcpserver-audit` six-category + `mcp-scan` matrix adopted as design
+  inspiration only; coverage claims constrained to per-check
+  declarations. Adds a controlled vocabulary of category slugs and
+  forbids over-claiming "covers" language in marketing copy.
+- **ADR-012** — Schema-hash diff as the canonical detection signal for
+  the rug-pull tool-mutation class. Phase 1 ships the
+  static-precondition fallback; full dynamic schema-hash diff reserved
+  for the future probe stage governed by ADR-010.
+- **Check** — `command-injection-flag-bypass-check.md`. Grep patterns
+  for direct command/subprocess injection sinks plus the flag-injection
+  bypass class against command allowlists. Cites Upsonic
+  CVE-2026-30625, Flowise CVE-2026-40933, `mcp-remote` CVE-2025-6514,
+  `figma-developer-mcp` CVE-2025-53967, `gemini-mcp-tool` CVE-2026-0755.
+- **Check** — `supply-chain-preinstall-hook-check.md`. npm lifecycle
+  hook inspection prompted by Shai-Hulud's November 2025 pivot from
+  `postinstall` to `preinstall` execution (Unit42).
+- **Check** — `supply-chain-maintainer-blast-radius-check.md`.
+  Maintainer-graph sibling-package enumeration as a combined-signal
+  input. Tiered severity (1 / 2–9 / 10–49 / 50+ sibling packages).
+- **Check** — `token-lifecycle-policy-check.md`. OWASP MCP Top 10
+  (2025) MCP01 detection criteria for TTL > session duration and
+  absence of enforced rotation.
+- **Check** — `tool-schema-mutation-rug-pull-check.md`. Static
+  precondition for rug-pull — flags tool-definition construction
+  sites whose `name` / `description` / `inputSchema` / `annotations`
+  derive from runtime-mutable state.
+- **Check** — `mcp-debug-log-redaction-check.md`. Orthogonal to the
+  upstream-forked credential-storage check; targets the OWASP MCP01
+  Scenario 2 "Log Scraping" failure mode.
+- **README — Limitations and honest framing**. Three new bullets
+  cover the taxonomy non-claim (ADR-011), the rug-pull static / dynamic
+  split (ADR-010 + ADR-012), and the Equixly prevalence figures that
+  did not survive adversarial verification (intent: position the
+  Phase 1.5 pilot as the first credible numerator/denominator
+  measurement on the official registry).
+- **`checks/ATTRIBUTION.md`** — six new entries in the "added in this
+  fork" section, each linked to the evidence file section that
+  motivated it.
+- **`docs/adr/INDEX.md`** — three new ADR rows.
+- **`docs/evidence/2026-05-29-deep-research-mcp-threat-surface.md`** —
+  full persistence of the dynamic-workflow run (metadata, decomposition,
+  seven confirmed findings, seven refuted claims, four open questions
+  for Phase 1.5, 30 sources with quality tags).
+
+### Design impact
+
+No source-code changes in this batch. The implementation of the new
+checks against the verdict aggregator is a Phase 1.5 deliverable. The
+intent of this design-only release is to lock in the threat-surface
+coverage and honest-framing constraints **before** the next code change
+so future PRs cannot quietly weaken them.
+
 ## [0.1.0] — 2026-05-29
 
 Phase 1 source-complete milestone. Twenty-two of twenty-three planned

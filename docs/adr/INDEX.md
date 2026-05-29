@@ -13,3 +13,6 @@ Nygard-format ADRs. Each record has four canonical sections: **Status**, **Conte
 | [ADR-007](ADR-007-mcpserver-audit-checks-fork.md) | Check seed: fork `mcpserver-audit/checks/` under Apache 2.0 with attribution preserved | Accepted |
 | [ADR-008](ADR-008-phase1-popularity-signal.md) | Phase 1 popularity signal: registry recency only (GitHub-stars enrichment deferred to Phase 1.5) | Accepted |
 | [ADR-009](ADR-009-pyyaml-runtime-dependency.md) | Phase 1 frontmatter parser: hand-rolled minimal subset, zero runtime deps | Accepted |
+| [ADR-010](ADR-010-sandbox-doctrine-for-future-stdio-probes.md) | Sandbox doctrine for any future stdio-probe stage | Accepted |
+| [ADR-011](ADR-011-mcp-protocol-threat-taxonomy-adoption.md) | Adopt MCP-protocol threat taxonomies as design inspiration, not as a sealed check schema | Accepted |
+| [ADR-012](ADR-012-schema-hash-diff-for-rug-pull-detection.md) | Schema-hash diff as the canonical detection signal for the "rug-pull" tool-mutation class | Accepted |
